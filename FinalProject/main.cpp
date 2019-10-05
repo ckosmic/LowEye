@@ -132,6 +132,8 @@ double spriteInfo[num3dSprites][4] = {
 	{16.5, 8.5, 0, 1},*/
 };
 
+double currentDistLT[SCREEN_HEIGHT+1];
+
 vec2 playerPos;
 vec2 playerDir;
 vec2 camPlane;
@@ -151,15 +153,13 @@ double spriteDist[num3dSprites];
 int menu = 1;
 int nextMenu = 0;
 int selectedButton = 0;
-bool noiseReduction = false;
 CHAR_INFO *transBuffer;
 bool paused = false;
 
 int main() {
 	srand(time(0));
-	loadConfig("PIXEL_SCALE=4\nNOISE_REDUCTION=0\n");
+	loadConfig("PIXEL_SCALE=4\nNOISE_REDUCTION=0\nOPTIMIZE_TEXTURES=0\n");
 	PIXEL_SCALE = stoi(getConfigValue("PIXEL_SCALE"));
-	noiseReduction = stoi(getConfigValue("NOISE_REDUCTION"));
 	setupWindow();
 
 	return 0;
@@ -180,14 +180,18 @@ void onWindowCreated() {
 	camPlane.x = 0;
 	camPlane.y = 0.6;
 
+	memset(currentDistLT, 0, SCREEN_HEIGHT + 1);
+
+	int optimizeTex = stoi(getConfigValue("OPTIMIZE_TEXTURES"));
+
 	// Main wall texture
 	loadSprite("resources\\textures\\wall.bmp", "wall1");
 	envTextures.push_back(getSprite("wall1"));
 	// Main floor texture
-	loadSprite("resources\\textures\\circle_floor.bmp", "circle_floor");
+	loadSprite(optimizeTex ? "resources\\textures\\circle_floor_optimized.bmp" : "resources\\textures\\circle_floor.bmp", "circle_floor");
 	envTextures.push_back(getSprite("circle_floor"));
 	// Main ceiling texture
-	loadSprite("resources\\textures\\ceiling.bmp", "ceiling");
+	loadSprite(optimizeTex ? "resources\\textures\\ceiling_optimized.bmp" : "resources\\textures\\ceiling.bmp", "ceiling");
 	envTextures.push_back(getSprite("ceiling"));
 	// Door texture
 	loadSprite("resources\\textures\\door.bmp", "door");
@@ -485,6 +489,7 @@ void renderEnvironment() {
 			}
 		}
 
+		
 		vec2 floorTexel;
 		if (side == 0 && rayDir.x > 0) {
 			floorTexel.x = mapPos.x;
@@ -507,27 +512,35 @@ void renderEnvironment() {
 
 		if (drawEnd < 0) drawEnd = SCREEN_HEIGHT;
 
+		unsigned int envTexSize = sizeof(envTextures) / sizeof(sprite);
+		sprite ceilTexture;
+		sprite floorTexture;
+		vec2 curFloor;
+		vec2Int floorTexCoords;
+		vec2Int ceilTexCoords;
 		for (int y = drawEnd + 1; y < SCREEN_HEIGHT + 1; y++) {
-			currentDist = SCREEN_HEIGHT / (2.0 * y - SCREEN_HEIGHT);
+			//currentDist = SCREEN_HEIGHT / (2.0 * y - SCREEN_HEIGHT);
+			currentDist = currentDistLT[y];
+			if (currentDist == 0.0) {
+				currentDistLT[y] = SCREEN_HEIGHT / (2.0 * y - SCREEN_HEIGHT);
+				currentDist = currentDistLT[y];
+			}
 			double weight = (currentDist - distPlayer) / (distWall - distPlayer);
 
-			vec2 curFloor;
 			curFloor.x = weight * floorTexel.x + (1.0 - weight) * playerPos.x;
 			curFloor.y = weight * floorTexel.y + (1.0 - weight) * playerPos.y;
 
 			int ceilIndex = ceilMap[int(curFloor.x)][int(curFloor.y)];
 			int floorIndex = floorMap[int(curFloor.x)][int(curFloor.y)];
-			if (ceilIndex > sizeof(envTextures) / sizeof(sprite) - 1) ceilIndex = sizeof(envTextures) / sizeof(sprite) - 1;
-			if (floorIndex > sizeof(envTextures) / sizeof(sprite) - 1) floorIndex = sizeof(envTextures) / sizeof(sprite) - 1;
+			if (ceilIndex > envTexSize - 1) ceilIndex = envTexSize - 1;
+			if (floorIndex > envTexSize - 1) floorIndex = envTexSize - 1;
 
-			sprite ceilTexture = envTextures[ceilIndex];
-			sprite floorTexture = envTextures[floorIndex];
+			ceilTexture = envTextures[ceilIndex];
+			floorTexture = envTextures[floorIndex];
 
-			vec2Int floorTexCoords;
 			floorTexCoords.x = int(curFloor.x * floorTexture.width) % floorTexture.width;
 			floorTexCoords.y = int(curFloor.y * floorTexture.height) % floorTexture.height;
 
-			vec2Int ceilTexCoords;
 			ceilTexCoords.x = int(curFloor.x * ceilTexture.width) % ceilTexture.width;
 			ceilTexCoords.y = int(curFloor.y * ceilTexture.height) % ceilTexture.height;
 
@@ -536,6 +549,7 @@ void renderEnvironment() {
 			if (floorTexture.valid) draw(x, y - 1, floorTexture.chars[floorPixIndex], floorTexture.colors[floorPixIndex] - 1);
 			if (ceilTexture.valid) draw(x, SCREEN_HEIGHT - y, ceilTexture.chars[ceilPixIndex], (ceilTexture.colors[ceilPixIndex] - 1) | FOREGROUND_INTENSITY);
 		}
+		
 	}
 
 	// --Sprite drawing--
@@ -598,7 +612,7 @@ void renderEnvironment() {
 		}
 	}
 
-	// Reduce noise to increase performance
+	// Reduce noise to increase performance a little bit
 	// Scene rendering will look ugly though
 	// But I mean, performance! Yay!
 	if (getConfigValue("NOISE_REDUCTION") == "1") {

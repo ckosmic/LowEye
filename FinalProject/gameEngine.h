@@ -67,7 +67,6 @@ extern int PIXEL_SCALE;
 void draw(int x, int y, wchar_t character, WORD color);
 void draw(int index, wchar_t character, WORD color);
 void drawUI(int x, int y, wchar_t character, WORD color);
-void drawSprite(int x, int y, WORD* data);
 void drawSprite(int x, int y, sprite spr);
 void drawSpriteTransparent(int x, int y, sprite spr);
 void mergeBuffers();

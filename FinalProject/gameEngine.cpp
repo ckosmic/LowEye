@@ -82,21 +82,6 @@ drawSprite: draws a sprite into the UI buffer
 
 int x: x position of the sprite from the left side
 int y: y position of the sprite from the top side
-WORD* data: a pointer to the sprite's char attributes data including its width and height
-*/
-void drawSprite(int x, int y, WORD* data) {
-	int width = data[0];
-	int height = data[1];
-	for (int i = 0; i < width*height; i++) {
-		drawUI(x + i % width, y + floor(i / width), PIXEL_SHADE0, data[i+2]);
-	}
-}
-
-/*
-drawSprite: draws a sprite into the UI buffer
-
-int x: x position of the sprite from the left side
-int y: y position of the sprite from the top side
 sprite spr: reference to a sprite object
 */
 void drawSprite(int x, int y, sprite spr) {

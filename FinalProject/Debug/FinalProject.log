@@ -1,10 +1,12 @@
-﻿  main.cpp
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(159): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(425): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(428): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(454): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(456): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(460): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(462): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(470): warning C4018: '>': signed/unsigned mismatch
-  FinalProject.vcxproj -> C:\Users\chris\source\repos\FinalProject\Debug\FinalProject.exe
+﻿  gameEngine.cpp
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.cpp(91): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.cpp(107): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.cpp(135): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.cpp(138): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.cpp(198): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.cpp(339): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.cpp(385): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.cpp(393): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.cpp(389): warning C4715: 'getConfigValue': not all control paths return a value
+  FinalProject.vcxproj -> C:\Users\Christian\Documents\Visual Studio 2017\Projects\LowEye\Debug\FinalProject.exe
+  FinalProject.vcxproj -> C:\Users\Christian\Documents\Visual Studio 2017\Projects\LowEye\Debug\FinalProject.pdb (Partial PDB)
