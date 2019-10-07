@@ -298,18 +298,30 @@ bool loadSprite(char* fileName, string name) {
 
 					WORD avg;
 					avg = 0;
+					WORD avgColor = 0;
+					avgColor = (r + g + b) / 3;
 					if (b > avg) avg = b;
 					if (g > avg) avg = g;
 					if (r > avg) avg = r;
 
 					if (avg < 256) shade = PIXEL_SHADE0;
-					if (avg < 224 && avg > 192) color ^= FOREGROUND_INTENSITY;
+					if (avg < 224 && avg >= 192) color ^= FOREGROUND_INTENSITY;
 					if (avg < 192) shade = PIXEL_SHADE1;
-					if (avg < 160 && avg > 128) color ^= FOREGROUND_INTENSITY;
+					if (avg < 160 && avg >= 128) color ^= FOREGROUND_INTENSITY;
 					if (avg < 128) shade = PIXEL_SHADE2;
-					if (avg < 96 && avg > 64) color ^= FOREGROUND_INTENSITY;
+					if (avg < 96 && avg >= 64) color ^= FOREGROUND_INTENSITY;
 					if (avg < 64) shade = PIXEL_SHADE3;
 					if (avg < 32) color ^= FOREGROUND_INTENSITY;
+
+					/*if (avgColor < 256 && avgColor > 192) shade = PIXEL_SHADE1;
+					if (avgColor < 192 && avgColor > 128) shade = PIXEL_SHADE2;
+					if (avgColor < 128 && avgColor > 64) shade = PIXEL_SHADE3;
+					if (avgColor > 64) {
+						color = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
+						if (b > 0) color |= BACKGROUND_BLUE;
+						if (g > 0) color |= BACKGROUND_GREEN;
+						if (r > 0) color |= BACKGROUND_RED;
+					}*/
 
 					color++;
 				}

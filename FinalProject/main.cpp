@@ -719,7 +719,8 @@ void update() {
 			// Draw crosshair
 			drawSprite(SCREEN_WIDTH / 2 - 8, SCREEN_HEIGHT / 2 - 8, uiSprites[0]);
 
-			sprintf(dbg, "%d", int(1 / deltaTime));
+			//sprintf(dbg, "%d", int(1 / deltaTime));
+			sprintf(dbg, "%d", (1/tan(3)/sin(3)) == (sin(3)/tan(3)));
 			printText(dbg, 1, 1);
 		}
 
