@@ -1,13 +1,11 @@
-﻿  main.cpp
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(160): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(429): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(432): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(458): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(460): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(464): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(466): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(474): warning C4018: '>': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(535): warning C4018: '>': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(536): warning C4018: '>': signed/unsigned mismatch
-  FinalProject.vcxproj -> C:\Users\Christian\Documents\Visual Studio 2017\Projects\LowEye\Debug\FinalProject.exe
-  FinalProject.vcxproj -> C:\Users\Christian\Documents\Visual Studio 2017\Projects\LowEye\Debug\FinalProject.pdb (Partial PDB)
+﻿  gameEngine.cpp
+c:\users\chris\source\repos\finalproject\finalproject\gameengine.cpp(91): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\gameengine.cpp(107): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\gameengine.cpp(135): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\gameengine.cpp(138): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\gameengine.cpp(198): warning C4018: '<': signed/unsigned mismatch
+c:\users\chris\source\repos\finalproject\finalproject\gameengine.cpp(354): warning C4018: '<': signed/unsigned mismatch
+c:\users\chris\source\repos\finalproject\finalproject\gameengine.cpp(410): warning C4018: '<': signed/unsigned mismatch
+c:\users\chris\source\repos\finalproject\finalproject\gameengine.cpp(424): warning C4018: '<': signed/unsigned mismatch
+c:\users\chris\source\repos\finalproject\finalproject\gameengine.cpp(414): warning C4715: 'getConfigValue': not all control paths return a value
+  FinalProject.vcxproj -> C:\Users\chris\source\repos\FinalProject\Debug\FinalProject.exe

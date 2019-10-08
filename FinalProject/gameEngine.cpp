@@ -233,6 +233,9 @@ void mergeBuffers() {
 	}
 }
 
+/*
+exitGame: exits the main loop (surprising huh)
+*/
 void exitGame() {
 	running = false;
 }
@@ -374,6 +377,11 @@ void setWindowTitle(LPWSTR title) {
 	winTitle = title;
 }
 
+/*
+loadConfig: loads a configuration file used for game settings
+
+char* defaultConfig: if the config file doesn't exist, write this to a new file
+*/
 void loadConfig(char* defaultConfig) {
 	ifstream config("settings.ini");
 	if (config.is_open()) {
@@ -393,6 +401,11 @@ void loadConfig(char* defaultConfig) {
 	config.close();
 }
 
+/*
+getConfigValue: returns the value of the specified configuration attribute
+
+char* attribute: the attribute to read
+*/
 string getConfigValue(char* attribute) {
 	for (int i = 0; i < configuration.attributes.size(); i++) {
 		if (strcmp(configuration.attributes[i].c_str(), attribute) == 0)
@@ -400,6 +413,12 @@ string getConfigValue(char* attribute) {
 	}
 }
 
+/*
+setConfigValue: sets a configuration value and writes it to the config file
+
+const char* attribute: the attribute to write to
+const char* value: the value to override
+*/
 void setConfigValue(const char* attribute, const char* value) {
 	string newCfg = "";
 	for (int i = 0; i < configuration.attributes.size(); i++) {

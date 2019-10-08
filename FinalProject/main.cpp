@@ -7,11 +7,12 @@
 #define mapWidth 24
 #define mapHeight 24
 #define doorId 4
-#define num3dSprites 1
+#define num3dSprites 2
 struct sprite3d {
 	int graphic;
 	sprite sprites[4];
 	double rotation;
+	double size;
 };
 
 int worldMap[mapWidth][mapHeight] =
@@ -128,8 +129,8 @@ int floorMap[mapWidth][mapHeight] =
 
 double spriteInfo[num3dSprites][4] = {
 	{20.5, 8.5, 0, 1},
-	/*{18.5, 8.5, 0, 1},
-	{16.5, 8.5, 0, 1},*/
+	{18.5, 8.5, 1, 1},
+	/*{16.5, 8.5, 0, 1},*/
 };
 
 double currentDistLT[SCREEN_HEIGHT+1];
@@ -201,12 +202,20 @@ void onWindowCreated() {
 	loadSprite("resources\\textures\\chars\\2.bmp", "2");
 	loadSprite("resources\\textures\\chars\\3.bmp", "3");
 	loadSprite("resources\\textures\\chars\\4.bmp", "4");
+	loadSprite("resources\\textures\\chest.bmp", "chest");
 	sprites3d[0] = { 0, {
 		getSprite("1"),
 		getSprite("2"),
 		getSprite("3"),
 		getSprite("4"),
-	}, 0.0 };
+	}, 0.0, 1.0 };
+
+	sprites3d[1] = { 0, {
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5 };
 
 	//sprites3d[0] = loadSprite("resources\\textures\\testsprite.bmp");
 
@@ -590,12 +599,16 @@ void renderEnvironment() {
 			sprite3d rotSprite = sprites3d[int(spriteInfo[spriteOrder[i]][2])];
 			double spDiff = rotSprite.rotation - atan2(spritePos.y, spritePos.x) * (180.0 / PI) + 180.0;
 
+			spriteWidth *= rotSprite.size;
+			spriteHeight *= rotSprite.size;
+
 			if (spDiff >= 315.0 || spDiff < 45.0) rotSprite.graphic = 0;
 			if (spDiff >= 45.0 && spDiff < 135.0) rotSprite.graphic = 1;
 			if (spDiff >= 135.0 && spDiff < 225.0) rotSprite.graphic = 2;
 			if (spDiff >= 225.0 && spDiff < 315.0) rotSprite.graphic = 3;
 
 			sprite drawSprite = rotSprite.sprites[rotSprite.graphic];
+			double spriteSize = rotSprite.size;
 			for (int x = drawStartX; x < drawEndX; x++) {
 				int texX = int(256 * (x - (-spriteWidth / 2 + spriteX)) * drawSprite.width / spriteWidth) / 256;
 				if (transform.y > 0 && x > 0 && x < SCREEN_WIDTH && transform.y < zbuffer[x]) {
@@ -719,8 +732,7 @@ void update() {
 			// Draw crosshair
 			drawSprite(SCREEN_WIDTH / 2 - 8, SCREEN_HEIGHT / 2 - 8, uiSprites[0]);
 
-			//sprintf(dbg, "%d", int(1 / deltaTime));
-			sprintf(dbg, "%d", (1/tan(3)/sin(3)) == (sin(3)/tan(3)));
+			sprintf(dbg, "%d", int(1 / deltaTime));
 			printText(dbg, 1, 1);
 		}
 
