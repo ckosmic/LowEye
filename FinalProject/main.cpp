@@ -13,6 +13,8 @@ struct sprite3d {
 	sprite sprites[4];
 	double rotation;
 	double size;
+	int offset;
+	double collisionRadius;
 };
 
 int worldMap[mapWidth][mapHeight] =
@@ -127,9 +129,9 @@ int floorMap[mapWidth][mapHeight] =
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-double spriteInfo[num3dSprites][4] = {
-	{20.5, 8.5, 0, 1},
-	{18.5, 8.5, 1, 1},
+double spriteInfo[num3dSprites][3] = {
+	{20.5, 8.5, 0},
+	{18.5, 8.5, 1},
 	/*{16.5, 8.5, 0, 1},*/
 };
 
@@ -156,6 +158,9 @@ int nextMenu = 0;
 int selectedButton = 0;
 CHAR_INFO *transBuffer;
 bool paused = false;
+bool mode7 = true;
+double bobIntensity = 0;
+double rotIntensity = 0;
 
 int main() {
 	srand(time(0));
@@ -208,14 +213,14 @@ void onWindowCreated() {
 		getSprite("2"),
 		getSprite("3"),
 		getSprite("4"),
-	}, 0.0, 1.0 };
+	}, 0.0, 1.0, 0, 1.0 };
 
 	sprites3d[1] = { 0, {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
-	}, 0.0, 0.5 };
+	}, 0.0, 0.5, 32, 0.5 };
 
 	//sprites3d[0] = loadSprite("resources\\textures\\testsprite.bmp");
 
@@ -234,6 +239,8 @@ void onWindowCreated() {
 	loadUiSprite("resources\\textures\\ui\\toggle_border.bmp", "toggle_border");
 	loadUiSprite("resources\\textures\\ui\\button_back.bmp", "button_back");
 	loadUiSprite("resources\\textures\\ui\\button_resume.bmp", "button_resume");
+
+	loadUiSprite("resources\\textures\\gun1.bmp", "gun1");
 
 	loadSprite("resources\\textures\\ui\\arrow0.bmp", "arrow0");
 	loadSprite("resources\\textures\\ui\\arrow1.bmp", "arrow1");
@@ -298,7 +305,7 @@ void combSort(int* order, double* dist, int amount) {
 
 bool isSpriteCollided(double x1, double x2) {
 	for (int i = 0; i < num3dSprites; i++) {
-		if (distance(x1, x2, spriteInfo[i][0], spriteInfo[i][1]) <= spriteInfo[i][3])
+		if (distance(x1, x2, spriteInfo[i][0], spriteInfo[i][1]) <= sprites3d[int(spriteInfo[i][2])].collisionRadius)
 			return true;
 	}
 	return false;
@@ -445,7 +452,8 @@ void renderEnvironment() {
 		sprite wallTex;
 		if (mapPos.x > mapWidth || mapPos.y > mapHeight || mapPos.x < 0 || mapPos.y < 0) {
 			wallTex = INVALID_SPRITE;
-		} else {
+		}
+		else {
 			wallTex = envTextures[texNum - 1];
 		}
 
@@ -463,11 +471,12 @@ void renderEnvironment() {
 			if (texNum == 4) {
 				if (side == 0) {
 					mapPos.x -= step.x * 0.5;
-					if(playerPos.x > mapPos.x)
+					if (playerPos.x > mapPos.x)
 						texX += wallTex.width * tileTimers[(int)mapPos.x][(int)mapPos.y];
 					else
 						texX -= wallTex.width * tileTimers[(int)mapPos.x][(int)mapPos.y];
-				} else {
+				}
+				else {
 					mapPos.y -= step.y * 0.5;
 					if (playerPos.y > mapPos.y)
 						texX -= wallTex.width * tileTimers[(int)mapPos.x][(int)mapPos.y];
@@ -493,12 +502,12 @@ void renderEnvironment() {
 		if (texNum == 4) {
 			if (side == 0) {
 				mapPos.x += step.x * 0.5;
-			} else {
+			}
+			else {
 				mapPos.y += step.y * 0.5;
 			}
 		}
 
-		
 		vec2 floorTexel;
 		if (side == 0 && rayDir.x > 0) {
 			floorTexel.x = mapPos.x;
@@ -528,7 +537,6 @@ void renderEnvironment() {
 		vec2Int floorTexCoords;
 		vec2Int ceilTexCoords;
 		for (int y = drawEnd + 1; y < SCREEN_HEIGHT + 1; y++) {
-			//currentDist = SCREEN_HEIGHT / (2.0 * y - SCREEN_HEIGHT);
 			currentDist = currentDistLT[y];
 			if (currentDist == 0.0) {
 				currentDistLT[y] = SCREEN_HEIGHT / (2.0 * y - SCREEN_HEIGHT);
@@ -572,6 +580,8 @@ void renderEnvironment() {
 	// Loop through all sprites and draw them
 	for (int i = 0; i < num3dSprites; i++) {
 		if (spriteDist[i] <= 100) {
+			sprite3d rotSprite = sprites3d[int(spriteInfo[spriteOrder[i]][2])];
+
 			vec2 spritePos;
 			spritePos.x = spriteInfo[spriteOrder[i]][0] - playerPos.x;
 			spritePos.y = spriteInfo[spriteOrder[i]][1] - playerPos.y;
@@ -584,19 +594,20 @@ void renderEnvironment() {
 
 			int spriteX = int((SCREEN_WIDTH / 2) * (1 + transform.x / transform.y));
 
+			int spriteMove = int(rotSprite.offset / transform.y);
+
 			int spriteHeight = abs(int(SCREEN_HEIGHT / (transform.y)));
-			int drawStartY = -spriteHeight / 2 + SCREEN_HEIGHT / 2;
+			int drawStartY = -spriteHeight / 2 + SCREEN_HEIGHT / 2 + spriteMove;
 			if (drawStartY < 0) drawStartY = 0;
-			int drawEndY = spriteHeight / 2 + SCREEN_HEIGHT / 2;
-			if (drawEndY >= SCREEN_HEIGHT) drawEndY = SCREEN_HEIGHT - 1;
+			int drawEndY = spriteHeight / 2 + SCREEN_HEIGHT / 2 + spriteMove;
+			if (drawEndY > SCREEN_HEIGHT) drawEndY = SCREEN_HEIGHT;
 
 			int spriteWidth = abs(int(SCREEN_HEIGHT / (transform.y)));
 			int drawStartX = -spriteWidth / 2 + spriteX;
 			if (drawStartX < 0) drawStartX = 0;
 			int drawEndX = spriteWidth / 2 + spriteX;
-			if (drawEndX >= SCREEN_WIDTH) drawEndX = SCREEN_WIDTH - 1;
+			if (drawEndX > SCREEN_WIDTH) drawEndX = SCREEN_WIDTH;
 
-			sprite3d rotSprite = sprites3d[int(spriteInfo[spriteOrder[i]][2])];
 			double spDiff = rotSprite.rotation - atan2(spritePos.y, spritePos.x) * (180.0 / PI) + 180.0;
 
 			spriteWidth *= rotSprite.size;
@@ -608,17 +619,19 @@ void renderEnvironment() {
 			if (spDiff >= 225.0 && spDiff < 315.0) rotSprite.graphic = 3;
 
 			sprite drawSprite = rotSprite.sprites[rotSprite.graphic];
-			double spriteSize = rotSprite.size;
 			for (int x = drawStartX; x < drawEndX; x++) {
 				int texX = int(256 * (x - (-spriteWidth / 2 + spriteX)) * drawSprite.width / spriteWidth) / 256;
-				if (transform.y > 0 && x > 0 && x < SCREEN_WIDTH && transform.y < zbuffer[x]) {
+				if (transform.y > 0 && x >= 0 && x < SCREEN_WIDTH && transform.y < zbuffer[x]) {
 					for (int y = drawStartY; y < drawEndY; y++) {
-						int d = (y) * 256 - SCREEN_HEIGHT * 128 + spriteHeight * 128;
+						int d = (y - spriteMove) * 256 - SCREEN_HEIGHT * 128 + spriteHeight * 128;
 						int texY = ((d * drawSprite.height) / spriteHeight) / 256;
-						WORD color = drawSprite.colors[drawSprite.width * texY + texX];
-						wchar_t character = drawSprite.chars[drawSprite.width * texY + texX];
-						if (color > 0)
-							draw(x, y, character, color - 1);
+						if (texY < drawSprite.height && texX < drawSprite.width
+							&& texY > -1 && texX > -1) {
+							WORD color = drawSprite.colors[drawSprite.width * texY + texX];
+							wchar_t character = drawSprite.chars[drawSprite.width * texY + texX];
+							if (color > 0)
+								draw(x, y, character, color - 1);
+						}
 					}
 				}
 			}
@@ -641,14 +654,16 @@ void renderEnvironment() {
 	}
 }
 
+// Runs every frame
 void update() {
 	if (menu == 0) {
 		if (paused == false) {
 			// Clear screen
 			clearScreen();
+			clearUI();
 
 			moveSpeed = 20 * deltaTime;
-			rotSpeed = 3 * deltaTime;
+			rotSpeed = 3 * deltaTime * rotIntensity;
 			velocity = lerp(velocity, 0, deltaTime * 10);
 
 			// Key input (movement, rotation, interaction)
@@ -696,6 +711,7 @@ void update() {
 				double oldPlaneX = camPlane.x;
 				camPlane.x = camPlane.x * cos(-rotSpeed) - camPlane.y * sin(-rotSpeed);
 				camPlane.y = oldPlaneX * sin(-rotSpeed) + camPlane.y * cos(-rotSpeed);
+				rotIntensity = lerp(rotIntensity, 1, deltaTime * 3);
 			}
 			if (keys[0x41].held) {
 				// Key D is down
@@ -705,7 +721,9 @@ void update() {
 				double oldPlaneX = camPlane.x;
 				camPlane.x = camPlane.x * cos(rotSpeed) - camPlane.y * sin(rotSpeed);
 				camPlane.y = oldPlaneX * sin(rotSpeed) + camPlane.y * cos(rotSpeed);
+				rotIntensity = lerp(rotIntensity, 1, deltaTime * 3);
 			}
+			if (!keys[0x44].held && !keys[0x41].held) rotIntensity = 0;
 			if (keys[0x45].pressed) {
 				// Key E was pressed
 			}
@@ -729,8 +747,15 @@ void update() {
 			// Render the whole scene
 			renderEnvironment();
 
+			if (keys[0x57].held || keys[0x53].held)
+				bobIntensity = lerp(bobIntensity, 1, deltaTime * 10);
+			else
+				bobIntensity = lerp(bobIntensity, 0, deltaTime * 10);
+
 			// Draw crosshair
 			drawSprite(SCREEN_WIDTH / 2 - 8, SCREEN_HEIGHT / 2 - 8, uiSprites[0]);
+
+			drawSprite(SCREEN_WIDTH-54 + int(sin((double)frame / 8) * 10 * bobIntensity), SCREEN_HEIGHT-54 + int(sin((double)frame / 4) * 5 * bobIntensity), uiSprites[12]);
 
 			sprintf(dbg, "%d", int(1 / deltaTime));
 			printText(dbg, 1, 1);
@@ -888,6 +913,8 @@ void update() {
 			delete[] transBuffer;
 		}
 	} else if (menu == 5) {
+		// Pause screen
+
 		// Quit button
 		drawSprite(SCREEN_WIDTH / 2 - uiSprites[11].width / 2, SCREEN_HEIGHT / 2 - uiSprites[11].height / 2 - 5, uiSprites[11]);
 		// Quit button
