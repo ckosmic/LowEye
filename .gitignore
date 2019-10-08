@@ -1,4 +1,9 @@
-.vs
-SpriteMaker
+.vs/
+SpriteMaker/
 FinalProject.VC.db
 FinalProject.VC.VC.opendb
+FinalProject/v15/
+*.exe
+*.ilk
+*.pdb
+FinalProject/Debug/
