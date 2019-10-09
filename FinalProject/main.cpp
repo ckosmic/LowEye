@@ -7,14 +7,14 @@
 #define mapWidth 24
 #define mapHeight 24
 #define doorId 4
-#define num3dSprites 2
 struct sprite3d {
-	int graphic;
-	sprite sprites[4];
-	double rotation;
-	double size;
-	int offset;
-	double collisionRadius;
+	vec2 position;				// Position on the map
+	int graphic;				// Which graphic to use when rotating
+	sprite sprites[4];			// The rotation sprites
+	double rotation;			// Rotation relative to the sprite
+	double size;				// The scale of the sprite
+	int offset;					// The Y offset of the sprite
+	double collisionRadius;		// The radius of player-sprite collision
 };
 
 int worldMap[mapWidth][mapHeight] =
@@ -129,12 +129,6 @@ int floorMap[mapWidth][mapHeight] =
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
 
-double spriteInfo[num3dSprites][3] = {
-	{20.5, 8.5, 0},
-	{18.5, 8.5, 1},
-	/*{16.5, 8.5, 0, 1},*/
-};
-
 double currentDistLT[SCREEN_HEIGHT+1];
 
 vec2 playerPos;
@@ -146,13 +140,14 @@ double velocity = 0.0;
 double rotSpeed = 3.0;
 double zbuffer[SCREEN_WIDTH];
 vector<sprite> envTextures;
-sprite3d sprites3d[num3dSprites];
+vector<sprite3d> sprites3d;
 vector<sprite> uiSprites;
 int lookingAt;
 vec2Int lookTile;
+int lookSprite;
 char* dbg = new char[64];
-int spriteOrder[num3dSprites];
-double spriteDist[num3dSprites];
+vector<int> spriteOrder;
+vector<double> spriteDist;
 int menu = 1;
 int nextMenu = 0;
 int selectedButton = 0;
@@ -208,21 +203,23 @@ void onWindowCreated() {
 	loadSprite("resources\\textures\\chars\\3.bmp", "3");
 	loadSprite("resources\\textures\\chars\\4.bmp", "4");
 	loadSprite("resources\\textures\\chest.bmp", "chest");
-	sprites3d[0] = { 0, {
+
+	sprites3d.push_back({ { 20.5, 8.5 }, 0, {
 		getSprite("1"),
 		getSprite("2"),
 		getSprite("3"),
 		getSprite("4"),
-	}, 0.0, 1.0, 0, 1.0 };
+	}, 0.0, 1.0, 0, 1.0 });
 
-	sprites3d[1] = { 0, {
+	sprites3d.push_back({ { 18.5, 8.5 }, 0, {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
-	}, 0.0, 0.5, 32, 0.5 };
+	}, 0.0, 0.5, 32, 0.5 });
 
-	//sprites3d[0] = loadSprite("resources\\textures\\testsprite.bmp");
+	spriteDist.resize(sprites3d.size());
+	spriteOrder.resize(sprites3d.size());
 
 	// UI sprites
 	loadUiSprite("resources\\textures\\crosshair.bmp", "crosshair");
@@ -281,7 +278,7 @@ void pauseGame() {
 	}
 }
 
-void combSort(int* order, double* dist, int amount) {
+void combSort(vector<int> &order, vector<double> &dist, int amount) {
 	int gap = amount;
 	bool swapped = false;
 	while (gap > 1 || swapped)
@@ -304,8 +301,8 @@ void combSort(int* order, double* dist, int amount) {
 }
 
 bool isSpriteCollided(double x1, double x2) {
-	for (int i = 0; i < num3dSprites; i++) {
-		if (distance(x1, x2, spriteInfo[i][0], spriteInfo[i][1]) <= sprites3d[int(spriteInfo[i][2])].collisionRadius)
+	for (int i = 0; i < sprites3d.size(); i++) {
+		if (distance(x1, x2, sprites3d[i].position.x, sprites3d[i].position.y) <= sprites3d[i].collisionRadius)
 			return true;
 	}
 	return false;
@@ -488,7 +485,8 @@ void renderEnvironment() {
 			for (int y = drawStart; y < drawEnd; y++) {
 				int d = y * 256 - SCREEN_HEIGHT * 128 + lineHeight * 128;
 				int texY = ((d * wallTex.height) / lineHeight) / 256;
-				UINT pixIndex = wallTex.width * texY + texX;
+				int pixIndex = wallTex.width * texY + texX;
+				if (pixIndex < 0) pixIndex = 0;
 				if (pixIndex > wallTex.width * wallTex.height - 1) pixIndex = wallTex.width * wallTex.height - 1;
 				WORD drawColor = wallTex.colors[pixIndex] - 1;
 				wchar_t drawChar = wallTex.chars[pixIndex];
@@ -571,20 +569,21 @@ void renderEnvironment() {
 
 	// --Sprite drawing--
 	// Sort sprites by distance from player
-	for (int i = 0; i < num3dSprites; i++) {
+	for (int i = 0; i < sprites3d.size(); i++) {
 		spriteOrder[i] = i;
-		spriteDist[i] = ((playerPos.x - spriteInfo[i][0]) * (playerPos.x - spriteInfo[i][0]) + (playerPos.y - spriteInfo[i][1]) * (playerPos.y - spriteInfo[i][1]));
+		spriteDist[i] = ((playerPos.x - sprites3d[i].position.x) * (playerPos.x - sprites3d[i].position.x) + (playerPos.y - sprites3d[i].position.y) * (playerPos.y - sprites3d[i].position.y));
 	}
-	combSort(spriteOrder, spriteDist, num3dSprites);
+	combSort(spriteOrder, spriteDist, sprites3d.size());
+	lookSprite = -1;
 
 	// Loop through all sprites and draw them
-	for (int i = 0; i < num3dSprites; i++) {
+	for (int i = 0; i < sprites3d.size(); i++) {
 		if (spriteDist[i] <= 100) {
-			sprite3d rotSprite = sprites3d[int(spriteInfo[spriteOrder[i]][2])];
+			sprite3d rotSprite = sprites3d[spriteOrder[i]];
 
 			vec2 spritePos;
-			spritePos.x = spriteInfo[spriteOrder[i]][0] - playerPos.x;
-			spritePos.y = spriteInfo[spriteOrder[i]][1] - playerPos.y;
+			spritePos.x = rotSprite.position.x - playerPos.x;
+			spritePos.y = rotSprite.position.y - playerPos.y;
 
 			double inverse = 1.0 / (camPlane.x * playerDir.y - playerDir.x * camPlane.y);
 
@@ -629,8 +628,11 @@ void renderEnvironment() {
 							&& texY > -1 && texX > -1) {
 							WORD color = drawSprite.colors[drawSprite.width * texY + texX];
 							wchar_t character = drawSprite.chars[drawSprite.width * texY + texX];
-							if (color > 0)
+							if (color > 0) {
+								if (x == SCREEN_WIDTH / 2 && y == SCREEN_HEIGHT / 2)
+									lookSprite = spriteOrder[i];
 								draw(x, y, character, color - 1);
+							}
 						}
 					}
 				}
@@ -726,6 +728,11 @@ void update() {
 			if (!keys[0x44].held && !keys[0x41].held) rotIntensity = 0;
 			if (keys[0x45].pressed) {
 				// Key E was pressed
+			}
+			if (keys[VK_SPACE].pressed) {
+				// Key Space was pressed
+				if (lookSprite >= 0)
+					sprites3d[lookSprite].position.x += 0.1;
 			}
 
 			// Opening/closing doors based off of distance between player and door

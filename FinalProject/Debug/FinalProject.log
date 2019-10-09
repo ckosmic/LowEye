@@ -1,15 +1,19 @@
 ﻿  main.cpp
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(166): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.h(5): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
+  c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.h(5): note: command-line arguments:  see previous definition of '_CRT_SECURE_NO_WARNINGS'
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(161): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(304): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(442): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
 c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(445): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(448): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(475): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(477): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(482): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(484): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(492): warning C4018: '>': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(552): warning C4018: '>': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(553): warning C4018: '>': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(472): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(474): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(479): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(481): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(550): warning C4018: '>': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(551): warning C4018: '>': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(572): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(580): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(612): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
 c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(613): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(614): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
   FinalProject.vcxproj -> C:\Users\Christian\Documents\Visual Studio 2017\Projects\LowEye\Debug\FinalProject.exe
   FinalProject.vcxproj -> C:\Users\Christian\Documents\Visual Studio 2017\Projects\LowEye\Debug\FinalProject.pdb (Partial PDB)
