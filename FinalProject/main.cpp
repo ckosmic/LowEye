@@ -17,6 +17,16 @@ struct sprite3d {
 	double collisionRadius;		// The radius of player-sprite collision
 };
 
+struct mapNode {
+	int x;
+	int y;
+	int px;
+	int py;
+	double g;
+	double h;
+	double f;
+};
+
 int worldMap[mapWidth][mapHeight] =
 {
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -158,7 +168,7 @@ double bobIntensity = 0;
 double rotIntensity = 0;
 
 int main() {
-	srand(time(0));
+	srand(time(NULL));
 	loadConfig("PIXEL_SCALE=4\nNOISE_REDUCTION=0\nOPTIMIZE_TEXTURES=0\n");
 	PIXEL_SCALE = stoi(getConfigValue("PIXEL_SCALE"));
 	setupWindow();
@@ -203,6 +213,10 @@ void onWindowCreated() {
 	loadSprite("resources\\textures\\chars\\3.bmp", "3");
 	loadSprite("resources\\textures\\chars\\4.bmp", "4");
 	loadSprite("resources\\textures\\chest.bmp", "chest");
+	loadSprite("resources\\textures\\enemy_0.bmp", "enemy_0");
+	loadSprite("resources\\textures\\enemy_1.bmp", "enemy_1");
+	loadSprite("resources\\textures\\enemy_2.bmp", "enemy_2");
+	loadSprite("resources\\textures\\enemy_3.bmp", "enemy_3");
 
 	sprites3d.push_back({ { 20.5, 8.5 }, 0, {
 		getSprite("1"),
@@ -217,6 +231,13 @@ void onWindowCreated() {
 		getSprite("chest"),
 		getSprite("chest"),
 	}, 0.0, 0.5, 32, 0.5 });
+
+	sprites3d.push_back({ { 20.5, 6.5 }, 0, {
+		getSprite("enemy_0"),
+		getSprite("enemy_1"),
+		getSprite("enemy_2"),
+		getSprite("enemy_3"),
+	}, 0.0, 0.75, 16, 0.75 });
 
 	spriteDist.resize(sprites3d.size());
 	spriteOrder.resize(sprites3d.size());
@@ -306,6 +327,19 @@ bool isSpriteCollided(double x1, double x2) {
 			return true;
 	}
 	return false;
+}
+
+bool operator < (const mapNode& mn1, const mapNode& mn2) {
+	return mn1.f < mn2.f;
+}
+
+bool isValidNode(int x, int y) {
+	int id = x + y * mapWidth;
+	return false;
+}
+
+void pathfind(vec2 start, vec2 end) {
+	
 }
 
 // Heavily modified version of Lode's Raycasting Tutorial for the Final Project
@@ -581,6 +615,11 @@ void renderEnvironment() {
 		if (spriteDist[i] <= 100) {
 			sprite3d rotSprite = sprites3d[spriteOrder[i]];
 
+			if (rotSprite.rotation > 180)
+				sprites3d[spriteOrder[i]].rotation = -180;
+			if(rotSprite.rotation < -180) 
+				sprites3d[spriteOrder[i]].rotation = 180;
+
 			vec2 spritePos;
 			spritePos.x = rotSprite.position.x - playerPos.x;
 			spritePos.y = rotSprite.position.y - playerPos.y;
@@ -607,7 +646,10 @@ void renderEnvironment() {
 			int drawEndX = spriteWidth / 2 + spriteX;
 			if (drawEndX > SCREEN_WIDTH) drawEndX = SCREEN_WIDTH;
 
-			double spDiff = rotSprite.rotation - atan2(spritePos.y, spritePos.x) * (180.0 / PI) + 180.0;
+			double spDiff = rotSprite.rotation - (atan2(spritePos.y, spritePos.x) * (180.0 / PI) + 180.0);
+			// Clamp sprite-player rotation between 0 and 360
+			if (spDiff > 360) spDiff -= 360;
+			if (spDiff < 0) spDiff += 360;
 
 			spriteWidth *= rotSprite.size;
 			spriteHeight *= rotSprite.size;
@@ -732,7 +774,7 @@ void update() {
 			if (keys[VK_SPACE].pressed) {
 				// Key Space was pressed
 				if (lookSprite >= 0)
-					sprites3d[lookSprite].position.x += 0.1;
+					sprites3d[lookSprite].position.x += 1000;
 			}
 
 			// Opening/closing doors based off of distance between player and door
@@ -762,10 +804,12 @@ void update() {
 			// Draw crosshair
 			drawSprite(SCREEN_WIDTH / 2 - 8, SCREEN_HEIGHT / 2 - 8, uiSprites[0]);
 
+			// Draw viewmodel
 			drawSprite(SCREEN_WIDTH-54 + int(sin((double)frame / 8) * 10 * bobIntensity), SCREEN_HEIGHT-54 + int(sin((double)frame / 4) * 5 * bobIntensity), uiSprites[12]);
 
-			sprintf(dbg, "%d", int(1 / deltaTime));
-			printText(dbg, 1, 1);
+			//if (lookSprite >= 0)
+				//sprintf(dbg, "%d", int(sprites3d[lookSprite].rotation));
+			//printText(dbg, 1, 1);
 		}
 
 		if (keys[0x1B].pressed) {

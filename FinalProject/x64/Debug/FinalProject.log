@@ -1,1 +1,14 @@
-﻿  FinalProject.vcxproj -> C:\Users\chris\source\repos\FinalProject\Debug\FinalProject.exe
+﻿  main.cpp
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(171): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(476): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(479): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(506): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(508): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(513): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(515): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(584): warning C4018: '>': signed/unsigned mismatch
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(585): warning C4018: '>': signed/unsigned mismatch
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(610): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(654): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(655): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
+  FinalProject.vcxproj -> C:\Users\chris\source\repos\FinalProject\Debug\FinalProject.exe
