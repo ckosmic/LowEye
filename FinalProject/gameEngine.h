@@ -1,6 +1,10 @@
 #ifndef GAMEENGINEH
 #define GAMEENGINEH
 
+#ifdef _MSC_VER
+#define _CRT_SECURE_NO_WARNINGS
+#endif
+
 #define _WIN32_WINNT 0x0500
 
 #include <iostream>

@@ -340,7 +340,6 @@ bool loadSprite(char* fileName, string name) {
 		spriteBank.push_back(output);
 		return true;
 	} else {
-		fclose(f);
 		return false;
 	}
 }
