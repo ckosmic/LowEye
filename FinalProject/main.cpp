@@ -27,6 +27,11 @@ struct mapNode {
 	double f;
 };
 
+struct playerStats {
+	int hp;
+	int maxHp;
+};
+
 int worldMap[mapWidth][mapHeight] =
 {
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -166,6 +171,7 @@ bool paused = false;
 bool mode7 = true;
 double bobIntensity = 0;
 double rotIntensity = 0;
+playerStats pStats;
 
 int main() {
 	srand(time(NULL));
@@ -260,6 +266,8 @@ void onWindowCreated() {
 
 	loadUiSprite("resources\\textures\\gun1.bmp", "gun1");
 
+	loadUiSprite("resources\\textures\\ui\\hp_label.bmp", "hp_label");
+
 	loadSprite("resources\\textures\\ui\\arrow0.bmp", "arrow0");
 	loadSprite("resources\\textures\\ui\\arrow1.bmp", "arrow1");
 	loadSprite("resources\\textures\\ui\\arrow2.bmp", "arrow2");
@@ -268,6 +276,11 @@ void onWindowCreated() {
 	loadSprite("resources\\textures\\ui\\arrow5.bmp", "arrow5");
 	loadSprite("resources\\textures\\ui\\arrow6.bmp", "arrow6");
 	loadSprite("resources\\textures\\ui\\arrow7.bmp", "arrow7");
+
+	pStats = {
+	100,			// Current HP
+	100				// Max HP
+	};
 }
 
 double distance(double x1, double y1, double x2, double y2) {
@@ -698,6 +711,27 @@ void renderEnvironment() {
 	}
 }
 
+void drawHealthBar(int x, int y, int width, int hp, int maxHp) {
+	int actualWidth = width * ((double)hp / (double)maxHp);
+	wchar_t characters[3] = {
+		PIXEL_SHADE0,
+		PIXEL_SHADE1,
+		PIXEL_SHADE1
+	};
+	WORD gray = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
+	for (int i = 0; i < 3; i++) {
+		draw(x, y + i+1, PIXEL_SHADE3, gray);
+		draw(x+width+1, y + i + 1, PIXEL_SHADE3, gray);
+		for (int j = 0; j < actualWidth; j++) {
+			WORD color = FOREGROUND_GREEN | FOREGROUND_INTENSITY;
+			if (i == 2) color ^= FOREGROUND_INTENSITY;
+			draw(j + x + 1, i + y + 1, characters[i], color);
+		}
+	}
+	horizLine(y, x, x + width + 1, PIXEL_SHADE3, gray);
+	horizLine(y + 4, x, x + width + 1, PIXEL_SHADE3, gray);
+}
+
 // Runs every frame
 void update() {
 	if (menu == 0) {
@@ -806,6 +840,9 @@ void update() {
 
 			// Draw viewmodel
 			drawSprite(SCREEN_WIDTH-54 + int(sin((double)frame / 8) * 10 * bobIntensity), SCREEN_HEIGHT-54 + int(sin((double)frame / 4) * 5 * bobIntensity), uiSprites[12]);
+
+			drawSprite(2, 1, uiSprites[13]);
+			drawHealthBar(1, 8, 64, pStats.hp, pStats.maxHp);
 
 			//if (lookSprite >= 0)
 				//sprintf(dbg, "%d", int(sprites3d[lookSprite].rotation));

@@ -162,6 +162,26 @@ void vertLine(int x, int y1, int y2, wchar_t character, WORD color) {
 }
 
 /*
+horizLine: draws a vertical line given an x position and 2 y positions
+
+int y: the y position of the line
+int x1: the first x position of the line
+int x2: the second x position of the line
+wchar_t character: the character to draw the line in
+WORD color: the color of the line to draw
+*/
+void horizLine(int y, int x1, int x2, wchar_t character, WORD color) {
+	int diff = x2 - x1;
+	int steps = abs(diff);
+	int x = x1;
+	for (int i = 0; i < steps + 1; i++) {
+		draw(x, y, character, color);
+		if (steps > 0)
+			x += diff / steps;
+	}
+}
+
+/*
 fillScreen: fills the entire screen buffer with a character and its color
 
 wchar_t character: the character to fill the screen buffer with

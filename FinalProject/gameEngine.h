@@ -76,6 +76,7 @@ void drawSpriteTransparent(int x, int y, sprite spr);
 void mergeBuffers();
 void line(int x1, int y1, int x2, int y2, wchar_t character, WORD color);
 void vertLine(int x, int y1, int y2, wchar_t character, WORD color);
+void horizLine(int y, int x1, int x2, wchar_t character, WORD color);
 void fillScreen(wchar_t character, WORD color);
 void clearScreen();
 void clearUI();
