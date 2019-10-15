@@ -93,6 +93,28 @@ void drawSprite(int x, int y, sprite spr) {
 }
 
 /*
+drawSpriteScaled: draws a scaled sprite into the UI buffer
+
+int x: x position of the sprite from the left side
+int y: y position of the sprite from the top side
+double scale: the scale of the sprite
+sprite spr: reference to a sprite object
+*/
+void drawSpriteScaled(int x, int y, double scale, sprite spr) {
+	int width = spr.width;
+	int height = spr.height;
+	int texX = 0, texY = 0;
+	for (int y2 = 0; y2 < height*scale; y2++) {
+		texY = (double)y2 / scale;
+		for (int x2 = 0; x2 < width*scale; x2++) {
+			texX = (double)x2 / scale;
+			int index = texY * width + texX;
+			drawUI(x2+x, y2+y, spr.chars[index], spr.colors[index]);
+		}
+	}
+}
+
+/*
 drawSpriteTransparent: draws a transparent sprite into the UI buffer (transparent color upon loading sprite is rgb(69, 4, 20))
 
 int x: x position of the sprite from the left side
@@ -105,6 +127,29 @@ void drawSpriteTransparent(int x, int y, sprite spr) {
 	for (int i = 0; i < width*height; i++) {
 		if (spr.colors[i] > 0)
 			drawUI(x + i % width, y + floor(i / width), spr.chars[i], spr.colors[i]);
+	}
+}
+
+/*
+drawSpriteScaledTransparent: draws a scaled transparent sprite into the UI buffer
+
+int x: x position of the sprite from the left side
+int y: y position of the sprite from the top side
+double scale: the scale of the sprite
+sprite spr: reference to a sprite object
+*/
+void drawSpriteScaledTransparent(int x, int y, double scale, sprite spr) {
+	int width = spr.width;
+	int height = spr.height;
+	int texX = 0, texY = 0;
+	for (int y2 = 0; y2 < height*scale; y2++) {
+		texY = (double)y2 / scale;
+		for (int x2 = 0; x2 < width*scale; x2++) {
+			texX = (double)x2 / scale;
+			int index = texY * width + texX;
+			if (spr.colors[index] > 0)
+				drawUI(x2 + x, y2 + y, spr.chars[index], spr.colors[index]);
+		}
 	}
 }
 
@@ -162,6 +207,26 @@ void vertLine(int x, int y1, int y2, wchar_t character, WORD color) {
 }
 
 /*
+vertLineUI: draws a vertical line given an x position and 2 y positions to the UI buffer
+
+int x: the x position of the line
+int y1: the first y position of the line
+int y2: the second y position of the line
+wchar_t character: the character to draw the line in
+WORD color: the color of the line to draw
+*/
+void vertLineUI(int x, int y1, int y2, wchar_t character, WORD color) {
+	int diff = y2 - y1;
+	int steps = abs(diff);
+	int y = y1;
+	for (int i = 0; i < steps + 1; i++) {
+		drawUI(x, y, character, color);
+		if (steps > 0)
+			y += diff / steps;
+	}
+}
+
+/*
 horizLine: draws a vertical line given an x position and 2 y positions
 
 int y: the y position of the line
@@ -176,6 +241,26 @@ void horizLine(int y, int x1, int x2, wchar_t character, WORD color) {
 	int x = x1;
 	for (int i = 0; i < steps + 1; i++) {
 		draw(x, y, character, color);
+		if (steps > 0)
+			x += diff / steps;
+	}
+}
+
+/*
+horizLineUI: draws a vertical line given an x position and 2 y positions to the UI buffer
+
+int y: the y position of the line
+int x1: the first x position of the line
+int x2: the second x position of the line
+wchar_t character: the character to draw the line in
+WORD color: the color of the line to draw
+*/
+void horizLineUI(int y, int x1, int x2, wchar_t character, WORD color) {
+	int diff = x2 - x1;
+	int steps = abs(diff);
+	int x = x1;
+	for (int i = 0; i < steps + 1; i++) {
+		drawUI(x, y, character, color);
 		if (steps > 0)
 			x += diff / steps;
 	}
