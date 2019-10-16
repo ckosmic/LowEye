@@ -6,6 +6,8 @@ Console Game Engine by Christian Kosman for Intro to C++ M10A Final Project
 
 #include "gameEngine.h"
 
+const string lowerLetters = "abcdefghijklmnopqrstuvwxyz";
+
 CHAR_INFO *buffer;
 CHAR_INFO *uiBuffer;
 chrono::system_clock::time_point a = chrono::system_clock::now();
@@ -14,6 +16,7 @@ key keys[256];
 double deltaTime;
 unsigned long frame;
 vector<sprite> spriteBank;
+vector<sprite> charBank;
 LPWSTR winTitle;
 bool running = true;
 int PIXEL_SCALE = 4;
@@ -298,32 +301,45 @@ printText: prints text to the uiBuffer using character sprites located at resour
 char* text: a pointer to a string to be printed
 int x: the x position of the text
 int y: the y position of the text
+LETTERCASE letterCase: the case of the text (UPPER, DEFAULT, LOWER)
 */
-void printText(char* text, int x, int y) {
+void printText(char* text, int x, int y, LETTERCASE letterCase, char* font) {
 	for (int i = 0; i < strlen(text); i++) {
 		if (text[i] == ' ') {
 			x += 4;
 		} else {
 			char* spritePath = new char[MAX_PATH];
-			int character = toupper(text[i]);
+			int character = 0;
+			if (letterCase == UPPER) character = toupper(text[i]);
+			else if (letterCase == LOWER) character = tolower(text[i]);
+			else character = text[i];
 			string charString(1, character);
 			if (text[i] == '.') charString = "DEC";
-			sprintf(spritePath, "resources\\textures\\chars\\%s.bmp", charString.c_str());
+			if (text[i] == '/') charString = "FORWARD_SLASH";
+			if (text[i] == ':') charString = "COLON";
+			if (islower(character))
+				sprintf(spritePath, "resources\\textures\\%s\\%ss.bmp", font, charString.c_str());
+			else
+				sprintf(spritePath, "resources\\textures\\%s\\%s.bmp", font, charString.c_str());
 			
-			sprite letter = getSprite(string(1, character));
+			sprite letter = getCharSprite(string(1, character));
 			if (letter.valid == INVALID_SPRITE.valid) {
-				loadSprite(spritePath, string(1, character));
-				letter = getSprite(string(1, character));
+				loadSprite(spritePath, string(1, character), 1);
+				letter = getCharSprite(string(1, character));
 			}
 			
 			if (letter.valid) {
-				drawSprite(x, y, letter);
+				drawSpriteTransparent(x, y, letter);
 				x += letter.width;
 			}
 
 			delete[] spritePath;
 		}
 	}
+}
+
+void printText(char* text, int x, int y, LETTERCASE letterCase) {
+	printText(text, x, y, letterCase, "chars");
 }
 
 /*
@@ -350,8 +366,9 @@ loadSprite: loads a sprite from a 24-bit .bmp file and tries to match colors to 
 
 char* fileName: the path to the file relative to the executable's directory
 string name: the name to assign to the sprite
+bool characterBank: load sprite into the character sprite bank?
 */
-bool loadSprite(char* fileName, string name) {
+bool loadSprite(char* fileName, string name, bool characterBank) {
 	char curDir[MAX_PATH];
 	GetModuleFileNameA(NULL, curDir, MAX_PATH);
 	string::size_type pos = string(curDir).find_last_of("\\/");
@@ -371,9 +388,10 @@ bool loadSprite(char* fileName, string name) {
 		memcpy(&depth, header + 28, sizeof(int));
 
 		int bpp = 3;
-
+		// This allows bmps with odd widths to load correctly
+		int rowPadded = (width * bpp + 3) & (~3);
 		int dataSize = bpp * width * height;
-		unsigned char* pixels = new unsigned char[width*bpp];
+		unsigned char* pixels = new unsigned char[rowPadded];
 
 		sprite output = {
 			width,
@@ -385,7 +403,7 @@ bool loadSprite(char* fileName, string name) {
 		};
 
 		for (int i = 0; i < height; i++) {
-			fread(pixels, sizeof(unsigned char), width*bpp, f);
+			fread(pixels, sizeof(unsigned char), rowPadded, f);
 			for (int j = 0; j < width*bpp; j += bpp) {
 				unsigned char b = pixels[j];
 				unsigned char g = pixels[j + 1];
@@ -421,16 +439,6 @@ bool loadSprite(char* fileName, string name) {
 					if (avg < 64) shade = PIXEL_SHADE3;
 					if (avg < 32) color ^= FOREGROUND_INTENSITY;
 
-					/*if (avgColor < 256 && avgColor > 192) shade = PIXEL_SHADE1;
-					if (avgColor < 192 && avgColor > 128) shade = PIXEL_SHADE2;
-					if (avgColor < 128 && avgColor > 64) shade = PIXEL_SHADE3;
-					if (avgColor > 64) {
-						color = FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
-						if (b > 0) color |= BACKGROUND_BLUE;
-						if (g > 0) color |= BACKGROUND_GREEN;
-						if (r > 0) color |= BACKGROUND_RED;
-					}*/
-
 					color++;
 				}
 
@@ -442,11 +450,18 @@ bool loadSprite(char* fileName, string name) {
 		delete[] pixels;
 		fclose(f);
 
-		spriteBank.push_back(output);
+		if(characterBank)
+			charBank.push_back(output);
+		else
+			spriteBank.push_back(output);
 		return true;
 	} else {
 		return false;
 	}
+}
+
+bool loadSprite(char* fileName, string name) {
+	return loadSprite(fileName, name, false);
 }
 
 /*
@@ -457,6 +472,18 @@ string name: the name of the sprite
 sprite getSprite(string name) {
 	for (int i = 0; i < spriteBank.size(); i++) {
 		if (spriteBank[i].name == name) return spriteBank[i];
+	}
+	return INVALID_SPRITE;
+}
+
+/*
+getCharSprite: returns a character sprite by name from the character sprite bank
+
+string name: the name of the sprite
+*/
+sprite getCharSprite(string name) {
+	for (int i = 0; i < charBank.size(); i++) {
+		if (charBank[i].name == name) return charBank[i];
 	}
 	return INVALID_SPRITE;
 }
@@ -548,9 +575,9 @@ void setupWindow() {
 
 	// Initialize the screen buffer
 	buffer = new CHAR_INFO[BUFFER_SIZE];
+	memset(buffer, 0, sizeof(CHAR_INFO) * BUFFER_SIZE);
 	// Initialize the UI buffer
 	uiBuffer = new CHAR_INFO[BUFFER_SIZE];
-	memset(buffer, 0, sizeof(CHAR_INFO) * BUFFER_SIZE);
 	memset(uiBuffer, 0, sizeof(CHAR_INFO) * BUFFER_SIZE);
 
 	HWND consoleWindow = GetConsoleWindow();

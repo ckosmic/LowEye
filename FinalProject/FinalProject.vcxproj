@@ -22,7 +22,7 @@
     <ProjectGuid>{53B7A696-96FD-4E33-AD68-C0271C3ABE60}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>FinalProject</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -153,11 +153,11 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="floor1.h" />
-    <ClInclude Include="floor2.h" />
     <ClInclude Include="gameEngine.h" />
-    <ClInclude Include="sprites.h" />
-    <ClInclude Include="wall1.h" />
+    <ClInclude Include="main.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="settings.ini" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

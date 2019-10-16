@@ -28,6 +28,12 @@ using namespace std;
 #define DEBUG_MODE 0
 #define PI 3.14159265
 
+enum LETTERCASE {
+	UPPER,
+	DEFAULT,
+	LOWER
+};
+
 struct vec2 {
 	double x;
 	double y;
@@ -58,7 +64,6 @@ struct config {
 
 const sprite INVALID_SPRITE = { NULL, NULL, NULL, NULL, false, "INVALID_SPRITE" };
 
-//Screen buffer
 extern CHAR_INFO *buffer;
 extern CHAR_INFO *uiBuffer;
 extern chrono::system_clock::time_point a;
@@ -84,9 +89,12 @@ void horizLineUI(int y, int x1, int x2, wchar_t character, WORD color);
 void fillScreen(wchar_t character, WORD color);
 void clearScreen();
 void clearUI();
-void printText(char* text, int x, int y);
+void printText(char* text, int x, int y, LETTERCASE letterCase);
+void printText(char* text, int x, int y, LETTERCASE letterCase, char* font);
 bool loadSprite(char* fileName, string name);
+bool loadSprite(char* fileName, string name, bool characterBank);
 sprite getSprite(string name);
+sprite getCharSprite(string name);
 double lerp(double a, double b, double f);
 
 void loadConfig(char* defaultConfig);

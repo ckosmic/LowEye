@@ -1,52 +1,9 @@
-#include "gameEngine.h"
-#include "sprites.h"
-#include "wall1.h"
-#include "floor1.h"
-#include "floor2.h"
+#include "main.h"
 
 #define mapWidth 24
 #define mapHeight 24
 #define doorId 4
 #define DISPLAY_FPS 0
-struct sprite3d {
-	vec2 position;				// Position on the map
-	int graphic;				// Which graphic to use when rotating
-	sprite sprites[4];			// The rotation sprites
-	double rotation;			// Rotation relative to the sprite
-	double size;				// The scale of the sprite
-	int offset;					// The Y offset of the sprite
-	double collisionRadius;		// The radius of player-sprite collision
-};
-
-struct mapNode {
-	int x;
-	int y;
-	int px;
-	int py;
-	double g;
-	double h;
-	double f;
-};
-
-struct enemy {
-	char* name;
-	sprite3d enemySprite;
-	int maxHp;
-	int strength;
-	int defense;
-};
-
-struct playerStats {
-	int hp;
-	int maxHp;
-	int strength;
-	int defense;
-};
-
-struct enemyStats {
-	int hp;
-	int maxHp;
-};
 
 int worldMap[mapWidth][mapHeight] =
 {
@@ -189,6 +146,14 @@ bool mode7 = true;
 double bobIntensity = 0;
 double rotIntensity = 0;
 playerStats pStats;
+struct battle_data {
+	enemyStats eStats;
+	int prevEHp;
+	int turn;
+	int timerFrame;
+	int battleMenu;
+	bool attackPAnim;
+} battleData;
 
 int main() {
 	srand(time(NULL));
@@ -239,45 +204,46 @@ void onWindowCreated() {
 	// Door texture
 	loadSprite("resources\\textures\\door.bmp", "door");
 	envTextures.push_back(getSprite("door"));
-
-	loadSprite("resources\\textures\\chars\\1.bmp", "1");
-	loadSprite("resources\\textures\\chars\\2.bmp", "2");
-	loadSprite("resources\\textures\\chars\\3.bmp", "3");
-	loadSprite("resources\\textures\\chars\\4.bmp", "4");
+	 
 	loadSprite("resources\\textures\\chest.bmp", "chest");
 	loadSprite("resources\\textures\\enemy_0.bmp", "enemy_0");
 	loadSprite("resources\\textures\\enemy_1.bmp", "enemy_1");
 	loadSprite("resources\\textures\\enemy_2.bmp", "enemy_2");
 	loadSprite("resources\\textures\\enemy_3.bmp", "enemy_3");
 
-	enemy mutant = {
-		"mutant",
-		{ { 20.5, 6.5 }, 0, {
-			getSprite("enemy_0"),
-			getSprite("enemy_1"),
-			getSprite("enemy_2"),
-			getSprite("enemy_3"),
-		}, 0.0, 0.75, 16, 0.75 },
+	// Default player stats
+	pStats = {
+		100,								// HP
 		100,								// Max HP
-		100,								// Strength
-		100									// Defense
+		1,									// Strength
+		1,									// Defense
+		{									// Attacks that the player posesses
+			FLAME,
+			LASER_GUN
+		}
 	};
 
-	sprites3d.push_back({ { 20.5, 8.5 }, 0, {
-		getSprite("1"),
-		getSprite("2"),
-		getSprite("3"),
-		getSprite("4"),
-	}, 0.0, 1.0, 0, 1.0 });
+	enemy mutant = {
+		100,								// Max HP
+		1,									// Strength
+		1,									// Defense
+		{ BASIC },							// Attacks that the enemy posesses
+		"Mutant"							// Enemy name
+	};
+
+	sprites3d.push_back({ { 20.5, 6.5 }, 0, {
+		getSprite("enemy_0"),
+		getSprite("enemy_1"),
+		getSprite("enemy_2"),
+		getSprite("enemy_3"),
+	}, 0.0, 0.75, 16, 0.75, 1, mutant });
 
 	sprites3d.push_back({ { 18.5, 8.5 }, 0, {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
-	}, 0.0, 0.5, 32, 0.5 });
-
-	sprites3d.push_back(mutant.enemySprite);
+	}, 0.0, 0.5, 32, 0.5});
 
 	spriteDist.resize(sprites3d.size());
 	spriteOrder.resize(sprites3d.size());
@@ -303,6 +269,7 @@ void onWindowCreated() {
 	loadUiSprite("resources\\textures\\ui\\hp_label.bmp", "hp_label");
 
 	loadUiSprite("resources\\textures\\ui\\battle_menu.bmp", "battle_menu");
+	loadUiSprite("resources\\textures\\ui\\battle_menu_half.bmp", "battle_menu_half");
 	loadUiSprite("resources\\textures\\ui\\battle_menu_attack.bmp", "battle_menu_attack");
 	loadUiSprite("resources\\textures\\ui\\battle_menu_items.bmp", "battle_menu_items");
 	loadUiSprite("resources\\textures\\ui\\battle_menu_abilities.bmp", "battle_menu_abilities");
@@ -316,11 +283,6 @@ void onWindowCreated() {
 	loadSprite("resources\\textures\\ui\\arrow5.bmp", "arrow5");
 	loadSprite("resources\\textures\\ui\\arrow6.bmp", "arrow6");
 	loadSprite("resources\\textures\\ui\\arrow7.bmp", "arrow7");
-
-	pStats = {
-	100,			// Current HP
-	100				// Max HP
-	};
 }
 
 double distance(double x1, double y1, double x2, double y2) {
@@ -342,7 +304,7 @@ void pauseGame() {
 			buffer[i].Attributes &= ~FOREGROUND_INTENSITY;
 		}
 
-		printText("Paused", 56, 10);
+		printText("Paused", 56, 10, UPPER);
 
 		menu = 5;
 		selectedButton = 0;
@@ -397,6 +359,18 @@ void battleTransition() {
 	mergeBuffers();
 	clearUI();
 	nextMenu = 6;
+	enemy en = sprites3d[lookSprite].enemyType;
+	battleData.eStats = {
+		en.maxHp,		// HP
+		en.maxHp,		// Max HP
+		en.strength,
+		en.defense,
+		en.attacks,
+		en.name
+	};
+	battleData.prevEHp = battleData.eStats.hp;
+	battleData.turn = 0;
+	battleData.battleMenu = 0;
 }
 
 // Heavily modified version of Lode's Raycasting Tutorial for the Final Project
@@ -764,16 +738,19 @@ void drawHealthBar(int x, int y, int width, int hp, int maxHp) {
 	};
 	WORD gray = (FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED) + 1;
 	for (int i = 0; i < 3; i++) {
-		drawUI(x, y + i+1, PIXEL_SHADE3, gray);
-		drawUI(x+width+1, y + i + 1, PIXEL_SHADE3, gray);
+		drawUI(x, y + i+1, PIXEL_SHADE3, 1);
+		drawUI(x+width+1, y + i + 1, PIXEL_SHADE3, 1);
 		for (int j = 0; j < actualWidth; j++) {
 			WORD color = (FOREGROUND_GREEN | FOREGROUND_INTENSITY) + 1;
 			if (i == 2) color ^= FOREGROUND_INTENSITY;
 			drawUI(j + x + 1, i + y + 1, characters[i], color);
 		}
+		for (int j = 0; j < width - actualWidth; j++) {
+			drawUI(j + x + 1 + actualWidth, i + y + 1, PIXEL_SHADE3, gray);
+		}
 	}
-	horizLineUI(y, x, x + width + 1, PIXEL_SHADE3, gray);
-	horizLineUI(y + 4, x, x + width + 1, PIXEL_SHADE3, gray);
+	horizLineUI(y, x, x + width + 1, PIXEL_SHADE3, 1);
+	horizLineUI(y + 4, x, x + width + 1, PIXEL_SHADE3, 1);
 }
 
 void readyForClrTrans() {
@@ -787,9 +764,27 @@ void readyForClrTrans() {
 	clearUI();
 }
 
+void enemyTick(int newHp, int x, int y, double scale, sprite spr) {
+	vec2Int offset = { 0, 0 };
+	int diff = abs(battleData.eStats.hp - newHp);
+	if (newHp != battleData.eStats.hp) {
+		bool diffPos = newHp > battleData.eStats.hp;
+		battleData.eStats.hp += (diffPos ? 1 : -1);
+		if (!diffPos) {
+			offset.x = (rand() % 3 - 1) * sqrt(diff);
+			offset.y = (rand() % 3 - 1) * sqrt(diff);
+		}
+	}
+	drawSpriteScaled(x + offset.x, y + offset.y, scale, spr);
+}
+
 // Runs every frame
 void update() {
 	if (menu == 0) {
+		bool transFlag = false;
+		if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
+			transFlag = true;
+
 		if (paused == false) {
 			// Clear screen
 			clearScreen();
@@ -892,17 +887,14 @@ void update() {
 			// Draw viewmodel
 			drawSprite(SCREEN_WIDTH - 54 + int(sin((double)frame / 8) * 10 * bobIntensity), SCREEN_HEIGHT - 54 + int(sin((double)frame / 4) * 5 * bobIntensity), getUiSprite("gun1"));
 
-			drawSprite(2, 1, getUiSprite("hp_label"));
-			drawHealthBar(1, 8, 64, pStats.hp, pStats.maxHp);
-
 			if (DISPLAY_FPS) {
 				sprintf(dbg, "%d", int(1 / deltaTime));
-				printText(dbg, 1, 1);
+				printText(dbg, 1, 1, UPPER);
 			}
 
 			if (keys[VK_SPACE].pressed) {
 				// Key Space was pressed
-				if (lookSprite >= 0)
+				if (lookSprite >= 0 && sprites3d[lookSprite].type == 1)
 					battleTransition();
 			}
 
@@ -911,6 +903,10 @@ void update() {
 		if (keys[0x1B].pressed) {
 			// Key ESC was pressed
 			pauseGame();
+		}
+
+		if (transFlag) {
+			readyForClrTrans();
 		}
 	} else if (menu == 1) {
 		//Main menu
@@ -980,7 +976,7 @@ void update() {
 		maxMenuItems = 2;
 
 		fillScreen(PIXEL_SHADE2, FOREGROUND_RED);
-		printText("Noise Reduction", 5, 8);
+		printText("Noise Reduction", 5, 8, UPPER);
 
 		drawSprite(SCREEN_WIDTH - 37, 5, (getConfigValue("NOISE_REDUCTION") == "1") ? uiSprites[8] : uiSprites[7]);
 
@@ -1039,7 +1035,8 @@ void update() {
 			for (int j = 0; j < speed; j++) {
 				int x = SCREEN_WIDTH + 32 + j - (selectedButton * speed) - (rnd % 32 + 1);
 				int index = i * SCREEN_WIDTH + x;
-				draw(x, i, transBuffer[index].Char.UnicodeChar, transBuffer[index].Attributes);
+				if(index > -1 && index < BUFFER_SIZE)
+					draw(x, i, transBuffer[index].Char.UnicodeChar, transBuffer[index].Attributes);
 			}
 		}
 
@@ -1049,6 +1046,7 @@ void update() {
 			menu = nextMenu;
 			delete[] transBuffer;
 			selectedButton = 0;
+			srand(time(0));
 		}
 	} else if (menu == 5) {
 		// Pause screen
@@ -1095,6 +1093,7 @@ void update() {
 		maxMenuItems = 3;
 
 		fillScreen(PIXEL_SHADE1, FOREGROUND_RED | FOREGROUND_BLUE);
+		clearUI();
 
 		// Capture key presses for selection (W and S)
 		if (keys[0x57].pressed) selectedButton--;
@@ -1106,24 +1105,91 @@ void update() {
 		int sprHeight = sprites3d[lookSprite].sprites[0].height;
 		double sprScale = 64.0 / sprHeight;
 
-		drawSpriteScaled(SCREEN_WIDTH / 2 - sprWidth * sprScale / 2, SCREEN_HEIGHT / 2 - sprHeight * sprScale / 2-10, sprScale, sprites3d[lookSprite].sprites[0]);
 
+		enemyTick(battleData.prevEHp, SCREEN_WIDTH / 2 - sprWidth * sprScale / 2, SCREEN_HEIGHT / 2 - sprHeight * sprScale / 2 - 10, sprScale, sprites3d[lookSprite].sprites[0]);
+
+
+// ---Begin drawing battle menu---
 		vec2Int menuPos = {2, SCREEN_HEIGHT - 32};
 
+		if (battleData.attackPAnim) {
+			if (frame - battleData.timerFrame < 30) {
+				menuPos.x += rand() % 3 - 1;
+				menuPos.y += rand() % 3 - 1;
+			} else {
+				battleData.attackPAnim = false;
+				battleData.turn = 0;
+			}
+		}
+
 		drawSprite(menuPos.x, menuPos.y, getUiSprite("battle_menu"));
-		drawSpriteTransparent(menuPos.x + 4 + (selectedButton == 0 ? 6 : 0), menuPos.y + 4, getUiSprite("battle_menu_attack"));
-		drawSpriteTransparent(menuPos.x + 4 + (selectedButton == 1 ? 6 : 0), menuPos.y + 12, getUiSprite("battle_menu_abilities"));
-		drawSpriteTransparent(menuPos.x + 4 + (selectedButton == 2 ? 6 : 0), menuPos.y + 20, getUiSprite("battle_menu_items"));
-		drawSpriteTransparent(menuPos.x + 107, menuPos.y + 4, getUiSprite("battle_menu_hp"));
+		drawSpriteTransparent(menuPos.x + 4 + (selectedButton == 0 && battleData.battleMenu == 0 ? 6 : 0), menuPos.y + 4, getUiSprite("battle_menu_attack"));
+		drawSpriteTransparent(menuPos.x + 4 + (selectedButton == 1 && battleData.battleMenu == 0 ? 6 : 0), menuPos.y + 12, getUiSprite("battle_menu_abilities"));
+		drawSpriteTransparent(menuPos.x + 4 + (selectedButton == 2 && battleData.battleMenu == 0 ? 6 : 0), menuPos.y + 20, getUiSprite("battle_menu_items"));
+
+		sprintf(dbg, "HP: %d/%d", pStats.hp, pStats.maxHp);
+		printText(dbg, menuPos.x + 64, menuPos.y + 4, DEFAULT, "chars_small");
 
 		// Draw selection arrow
 		char arrowFrame[7];
 		sprintf(arrowFrame, "arrow%d", ((frame / 4) % 8));
 		int buttonLoc = menuPos.y + 2 + (selectedButton * 8);
-		drawSpriteScaledTransparent(menuPos.x, buttonLoc, 0.5, getSprite(arrowFrame));
+		if(battleData.battleMenu > 0)
+			drawSpriteScaledTransparent(menuPos.x+16, buttonLoc-8, 0.5, getSprite(arrowFrame));
+		else
+			drawSpriteScaledTransparent(menuPos.x, buttonLoc, 0.5, getSprite(arrowFrame));
 
 
-		drawHealthBar(SCREEN_WIDTH-40, menuPos.y + 4, 32, pStats.hp, pStats.maxHp);
+		// Player health bar
+		drawHealthBar(menuPos.x + 118, menuPos.y + 4, 32, pStats.hp, pStats.maxHp);
+		
+		if (battleData.battleMenu == 1) {
+			drawSprite(menuPos.x+16, menuPos.y-8, getUiSprite("battle_menu_half"));
+		}
+
+
+// ---End drawing battle menu---
+
+		printText(battleData.eStats.name, 1, 1, DEFAULT, "chars_small");
+		// Enemy health bar
+		drawHealthBar(1, 8, 64, battleData.eStats.hp, battleData.eStats.maxHp);
+		sprintf(dbg, "HP: %d/%d", battleData.eStats.hp, battleData.eStats.maxHp);
+		printText(dbg, 1, 15, DEFAULT, "chars_small");
+
+
+		// Capture enter key to select action
+		if (keys[VK_RETURN].pressed) {
+			if (selectedButton == 0 && battleData.turn == 0) {
+				battleData.timerFrame = frame;
+				if (selectedButton == 0) {
+					battleData.turn = 1;
+					battleData.prevEHp -= ceil((double)pStats.strength / battleData.eStats.defense) * (16 + (rand() % 2));
+				}
+			}
+			if (selectedButton == 1) {
+				battleData.battleMenu = 1;
+				selectedButton = 0;
+			}
+		}
+
+		if (battleData.turn == 1) {
+			if (frame - battleData.timerFrame > 120) {
+				int attackIndex = rand() % battleData.eStats.attacks.size();
+				attack eAttack = battleData.eStats.attacks[attackIndex];
+				pStats.hp -= ceil((double)battleData.eStats.strength / pStats.defense) * (eAttack.power + (rand() % eAttack.randomness));
+				battleData.timerFrame = frame;
+				battleData.attackPAnim = true;
+			}
+		}
+
+		if (battleData.eStats.hp == 0) {
+			selectedButton = 0;
+			menu = 3;
+			mergeBuffers();
+			clearUI();
+			nextMenu = 0;
+			sprites3d[lookSprite].position.x += 10000;
+		}
 
 		if (transFlag) {
 			readyForClrTrans();

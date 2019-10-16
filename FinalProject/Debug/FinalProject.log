@@ -1,19 +1,28 @@
 ﻿  main.cpp
 c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.h(5): warning C4005: '_CRT_SECURE_NO_WARNINGS': macro redefinition
   c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\gameengine.h(5): note: command-line arguments:  see previous definition of '_CRT_SECURE_NO_WARNINGS'
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(161): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(304): warning C4018: '<': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(442): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(445): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(472): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(474): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(479): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(481): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(550): warning C4018: '>': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(551): warning C4018: '>': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(572): warning C4018: '<': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(580): warning C4018: '<': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(612): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(613): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(159): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(173): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(340): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(507): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(510): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(537): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(539): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(544): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(546): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(615): warning C4018: '>': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(616): warning C4018: '>': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(637): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(645): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(685): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(686): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(733): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(774): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(775): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1049): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1109): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1166): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1179): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(179): warning C4715: 'getUiSprite': not all control paths return a value
   FinalProject.vcxproj -> C:\Users\Christian\Documents\Visual Studio 2017\Projects\LowEye\Debug\FinalProject.exe
   FinalProject.vcxproj -> C:\Users\Christian\Documents\Visual Studio 2017\Projects\LowEye\Debug\FinalProject.pdb (Partial PDB)

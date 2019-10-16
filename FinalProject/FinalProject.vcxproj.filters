@@ -26,17 +26,11 @@
     <ClInclude Include="gameEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sprites.h">
+    <ClInclude Include="main.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wall1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="floor1.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="floor2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="settings.ini" />
   </ItemGroup>
 </Project>
