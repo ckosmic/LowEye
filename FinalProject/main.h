@@ -70,14 +70,14 @@ const attack BASIC = {
 	"Attack"							// Name of attack
 };
 const attack FLAME = {
-	5,									// Power
+	10,									// Power
 	0,									// Type of attack
 	2,									// Randomness addition to power
 	5,
 	"Flame"								// Name of attack
 };
 const attack LASER_GUN = {
-	4,
+	9,
 	0,
 	2,
 	4,
@@ -89,4 +89,11 @@ const attack SUPER = {
 	0,
 	0,
 	"Super"
+};
+const attack BITE = {
+	5,
+	0,
+	3,
+	100,
+	"Bite"
 };

@@ -183,8 +183,8 @@ sprite getUiSprite(string name) {
 void onWindowCreated() {
 	setWindowTitle(L"LowEye");
 
-	playerPos.x = 21;
-	playerPos.y = 12;
+	playerPos.x = 21.5;
+	playerPos.y = 12.5;
 	playerDir.x = -1;
 	playerDir.y = 0;
 	camPlane.x = 0;
@@ -208,10 +208,16 @@ void onWindowCreated() {
 	envTextures.push_back(getSprite("door"));
 	 
 	loadSprite("resources\\textures\\chest.bmp", "chest");
+
 	loadSprite("resources\\textures\\enemy_0.bmp", "enemy_0");
 	loadSprite("resources\\textures\\enemy_1.bmp", "enemy_1");
 	loadSprite("resources\\textures\\enemy_2.bmp", "enemy_2");
 	loadSprite("resources\\textures\\enemy_3.bmp", "enemy_3");
+
+	loadSprite("resources\\textures\\enemy1_0.bmp", "enemy1_0");
+	loadSprite("resources\\textures\\enemy1_1.bmp", "enemy1_1");
+	loadSprite("resources\\textures\\enemy1_2.bmp", "enemy1_2");
+	loadSprite("resources\\textures\\enemy1_3.bmp", "enemy1_3");
 
 	// Default player stats
 	pStats = {
@@ -245,6 +251,15 @@ void onWindowCreated() {
 		"Mutant"							// Enemy name
 	};
 
+	enemy warrior = {
+		125,
+		2,
+		2,
+		110,
+		{ BASIC, BITE },
+		"Warrior"
+	};
+
 	sprites3d.push_back({ { 20.5, 10.5 }, 0, {
 		getSprite("enemy_0"),
 		getSprite("enemy_1"),
@@ -258,6 +273,13 @@ void onWindowCreated() {
 		getSprite("enemy_2"),
 		getSprite("enemy_3"),
 	}, 0.0, 0.75, 16, 0.75, 1, mutant });
+
+	sprites3d.push_back({ { 16.5, 6.5 }, 0,{
+		getSprite("enemy1_0"),
+		getSprite("enemy1_1"),
+		getSprite("enemy1_2"),
+		getSprite("enemy1_3"),
+	}, 0.0, 0.75, 16, 0.75, 1, warrior });
 
 	sprites3d.push_back({ { 18.5, 8.5 }, 0, {
 		getSprite("chest"),
@@ -1226,7 +1248,7 @@ void update() {
 					battleData.timerFrame = frame;
 					if (selectedButton == 0) {
 						battleData.turn = 1;
-						battleData.prevEHp -= ceil((double)pStats.strength / battleData.eStats.defense) * (4 + (rand() % 2)) * ceil((double)pStats.level/10);
+						battleData.prevEHp -= ceil((double)pStats.strength / battleData.eStats.defense) * (8 + (rand() % 2)) * ceil((double)pStats.level/10);
 					}
 				}
 				if (selectedButton == 1) {
