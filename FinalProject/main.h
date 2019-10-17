@@ -4,6 +4,7 @@ struct attack {
 	int power;
 	int type;					// (0 - ability)
 	int randomness;
+	int apCost;
 	char* name;
 };
 
@@ -11,6 +12,7 @@ struct enemy {
 	int maxHp;
 	int strength;
 	int defense;
+	int xp;
 	vector<attack> attacks;
 	char* name;
 };
@@ -40,9 +42,14 @@ struct mapNode {
 struct playerStats {
 	int hp;
 	int maxHp;
+	int ap;
+	int maxAp;
 	int strength;
 	int defense;
 	vector<attack> attacks;
+	int xp;
+	int maxXp;
+	int level;
 };
 
 struct enemyStats {
@@ -52,23 +59,34 @@ struct enemyStats {
 	int defense;
 	vector<attack> attacks;
 	char* name;
+	int xp;
 };
 
 const attack BASIC = {
 	3,									// Power
 	0,									// Type of attack
 	1,									// Randomness addition to power
+	0,									// AP cost
 	"Attack"							// Name of attack
 };
 const attack FLAME = {
 	5,									// Power
 	0,									// Type of attack
 	2,									// Randomness addition to power
+	5,
 	"Flame"								// Name of attack
 };
 const attack LASER_GUN = {
 	4,
 	0,
 	2,
+	4,
 	"Laser Gun"
+};
+const attack SUPER = {
+	100,
+	0,
+	0,
+	0,
+	"Super"
 };

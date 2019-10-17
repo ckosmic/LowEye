@@ -322,10 +322,12 @@ void printText(char* text, int x, int y, LETTERCASE letterCase, char* font) {
 			else
 				sprintf(spritePath, "resources\\textures\\%s\\%s.bmp", font, charString.c_str());
 			
-			sprite letter = getCharSprite(string(1, character));
+			char* sprName = new char[MAX_PATH];
+			sprintf(sprName, "%s_%s", string(1, character).c_str(), font);
+			sprite letter = getCharSprite(string(sprName));
 			if (letter.valid == INVALID_SPRITE.valid) {
-				loadSprite(spritePath, string(1, character), 1);
-				letter = getCharSprite(string(1, character));
+				loadSprite(spritePath, string(sprName), 1);
+				letter = getCharSprite(string(sprName));
 			}
 			
 			if (letter.valid) {
@@ -334,6 +336,7 @@ void printText(char* text, int x, int y, LETTERCASE letterCase, char* font) {
 			}
 
 			delete[] spritePath;
+			delete[] sprName;
 		}
 	}
 }
