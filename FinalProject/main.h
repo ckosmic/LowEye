@@ -12,12 +12,14 @@ class item {
 private:
 	void(*fptr_void)() = NULL;
 	void(*fptr_int)(int) = NULL;
+	int val = -69420;
 public:
 	char name[MAX_PATH];
 
-	item(const char* itemName, void(*func)(int)) {
+	item(const char* itemName, void(*func)(int), int v) {
 		strcpy(name, itemName);
 		fptr_int = func;
+		val = v;
 	}
 
 	item(const char* itemName, void(*func)()) {
@@ -25,12 +27,11 @@ public:
 		fptr_void = func;
 	}
 
-	void action(int val) {
-		(*fptr_int)(val);
-	}
-
 	void action() {
-		(*fptr_void)();
+		if(val == -69420)
+			(*fptr_void)();
+		else
+			(*fptr_int)(val);
 	}
 };
 
@@ -95,7 +96,27 @@ struct obtainable {
 
 };
 
+struct flag {
+	string name;
+	int endFrame;
+};
+
+struct battle_data {
+	enemyStats eStats;
+	int prevEHp;
+	int turn;
+	int timerFrame;
+	int battleMenu;
+	int scrollPos;
+} battleData;
+
 extern playerStats pStats;
+extern vector<flag> flags;
+
+void setFlag(string name, int length);
+void removeFlag(string name);
+bool getFlag(string name);
+int getFlagFramesLeft(string name);
 
 #pragma region Attacks
 
@@ -147,10 +168,12 @@ const attack A_BITE = {
 #pragma region Items
 
 void modifyPlayerHp(int amount) {
+	setFlag("potionFx", 100);
 	pStats.hp += amount;
+	if (pStats.hp > pStats.maxXp) pStats.hp = pStats.maxHp;
 }
 
-item I_POTION("Potion", modifyPlayerHp);
+item I_POTION("Potion", modifyPlayerHp, 50);
 
 #pragma endregion
 

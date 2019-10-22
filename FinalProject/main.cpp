@@ -147,16 +147,7 @@ bool mode7 = true;
 double bobIntensity = 0;
 double rotIntensity = 0;
 playerStats pStats;
-struct battle_data {
-	enemyStats eStats;
-	int prevEHp;
-	int turn;
-	int timerFrame;
-	int battleMenu;
-	int scrollPos;
-	bool attackPAnim;
-	bool msgShown;
-} battleData;
+vector<flag> flags;
 
 int main() {
 	srand(time(NULL));
@@ -179,6 +170,46 @@ sprite getUiSprite(string name) {
 			break;
 		}
 	}
+}
+
+void setFlag(string name, int length) {
+	for (int i = 0; i < flags.size(); i++) {
+		if (flags[i].name == name) {
+			flags[i].endFrame = frame + length;
+			return;
+		}
+	}
+	flag newFlag = {
+		name,
+		frame + length
+	};
+	flags.push_back(newFlag);
+}
+
+void removeFlag(string name) {
+	for (int i = 0; i < flags.size(); i++) {
+		if (flags[i].name == name) {
+			flags.erase(flags.begin() + i);
+		}
+	}
+}
+
+bool getFlag(string name) {
+	for (int i = 0; i < flags.size(); i++) {
+		if (flags[i].name == name) {
+			return true;
+		}
+	}
+	return false;
+}
+
+int getFlagFramesLeft(string name) {
+	for (int i = 0; i < flags.size(); i++) {
+		if (flags[i].name == name) {
+			return flags[i].endFrame - frame;
+		}
+	}
+	return -1;
 }
 
 void onWindowCreated() {
@@ -239,8 +270,6 @@ void onWindowCreated() {
 		},
 		{									// Items that the player posesses
 			I_POTION,
-			I_POTION,
-			I_POTION
 		}
 	};
 
@@ -826,9 +855,17 @@ void enemyTick(int newHp, int x, int y, double scale, sprite spr) {
 			offset.x = (rand() % 3 - 1) * sqrt(diff);
 			offset.y = (rand() % 3 - 1) * sqrt(diff);
 		}
-		battleData.msgShown = false;
 	}
 	drawSpriteScaled(x + offset.x, y + offset.y, scale, spr);
+}
+
+void removeItem(char* name) {
+	for (int i = 0; i < pStats.items.size(); i++) {
+		if (strcmp(pStats.items[i].name, name) == 0) {
+			pStats.items.erase(pStats.items.begin() + i);
+			break;
+		}
+	}
 }
 
 // Runs every frame
@@ -1187,14 +1224,10 @@ void update() {
 // ---Begin drawing battle menu---
 		vec2Int menuPos = {2, SCREEN_HEIGHT - 32};
 
-		if (battleData.attackPAnim) {
-			if (frame - battleData.timerFrame < 30) {
-				menuPos.x += rand() % 3 - 1;
-				menuPos.y += rand() % 3 - 1;
-			} else {
-				battleData.attackPAnim = false;
-				battleData.turn = 0;
-			}
+		if (getFlag("attackPAnim")) {
+			menuPos.x += rand() % 3 - 1;
+			menuPos.y += rand() % 3 - 1;
+			if (getFlagFramesLeft("attackPAnim") <= 1) battleData.turn = 0;
 		}
 
 		drawSprite(menuPos.x, menuPos.y, getUiSprite("battle_menu"));
@@ -1213,12 +1246,21 @@ void update() {
 		drawHealthBar(menuPos.x + 118, menuPos.y + 4, 32, pStats.hp, pStats.maxHp, (FOREGROUND_GREEN | FOREGROUND_INTENSITY) + 1);
 		// Player AP bar
 		drawHealthBar(menuPos.x + 118, menuPos.y + 12, 32, pStats.ap, pStats.maxAp, (FOREGROUND_RED | FOREGROUND_INTENSITY) + 1);
+
+		if (getFlag("potionFx")) {
+			for (int y = -1; y < 6; y++) {
+				for (int x = -1; x < 35 ; x++) {
+					int rnd = rand() % (int((100-(double)getFlagFramesLeft("potionFx"))/10)+1);
+					if (rnd == 0) drawUI(x + menuPos.x + 118, y + menuPos.y + 4, PIXEL_SHADE0, (FOREGROUND_GREEN | FOREGROUND_INTENSITY) + 1);
+				}
+			}
+		}
 		
 		if (battleData.battleMenu == 1) {
 			drawSpriteTransparent(menuPos.x+16, menuPos.y-8, getUiSprite("battle_menu_half"));
 
 			int sz = 3;
-			if (pStats.items.size() < sz) sz = pStats.items.size();
+			if (pStats.attacks.size() < sz) sz = pStats.items.size();
 			for (int i = battleData.scrollPos; i < battleData.scrollPos + sz; i++) {
 				printText(pStats.attacks[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8*(i - battleData.scrollPos), DEFAULT, "chars_small");
 			}
@@ -1299,7 +1341,7 @@ void update() {
 					pStats.ap -= pAttack.apCost;
 				} else {
 					battleData.timerFrame = frame;
-					battleData.msgShown = true;
+					setFlag("msgShown", 240);
 				}
 			} else if (battleData.battleMenu == 2) {
 				item pItem = pStats.items[selectedButton];
@@ -1308,6 +1350,8 @@ void update() {
 				selectedButton = 0;
 				maxMenuItems = 3;
 				battleData.turn = 1;
+				battleData.timerFrame = frame;
+				removeItem(pItem.name);
 			}
 		}
 
@@ -1318,13 +1362,13 @@ void update() {
 				attack eAttack = battleData.eStats.attacks[attackIndex];
 				pStats.hp -= ceil((double)battleData.eStats.strength / pStats.defense) * (eAttack.power + (rand() % eAttack.randomness));
 				battleData.timerFrame = frame;
-				battleData.attackPAnim = true;
+				setFlag("attackPAnim", 30);
 			}
+			removeFlag("msgShown");
 		} else {
-			if (frame - battleData.timerFrame < 120 && !transFlag && battleData.msgShown) {
+			if (!transFlag && getFlag("msgShown")) {
 				printText("Not enough AP.", menuPos.x, menuPos.y - 16, DEFAULT, "chars_small");
 			}
-			else battleData.msgShown = false;
 		}
 
 		if (battleData.eStats.hp == 0) {
@@ -1374,6 +1418,12 @@ void update() {
 
 		if (transFlag) {
 			readyForClrTrans();
+		}
+	}
+
+	for (int i = 0; i < flags.size(); i++) {
+		if (flags[i].endFrame <= frame) {
+			flags.erase(flags.begin() + i);
 		}
 	}
 }
