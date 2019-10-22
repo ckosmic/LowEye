@@ -1,25 +1,28 @@
 ﻿  main.cpp
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(161): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(534): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(537): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(564): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(566): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(571): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(573): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(642): warning C4018: '>': signed/unsigned mismatch
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(643): warning C4018: '>': signed/unsigned mismatch
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(668): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(712): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(713): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(760): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(800): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(801): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1072): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1154): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1229): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(162): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(558): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(561): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(588): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(590): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(595): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(597): warning C4244: '+=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(666): warning C4018: '>': signed/unsigned mismatch
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(667): warning C4018: '>': signed/unsigned mismatch
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(692): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(736): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(737): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(786): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(826): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(827): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1102): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1184): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1221): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
 c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1235): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1241): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1260): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1282): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
-c:\users\chris\source\repos\finalproject\finalproject\main.cpp(181): warning C4715: 'getUiSprite': not all control paths return a value
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1275): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1281): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1287): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1293): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1319): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(1341): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
+c:\users\chris\source\repos\finalproject\finalproject\main.cpp(182): warning C4715: 'getUiSprite': not all control paths return a value
   FinalProject.vcxproj -> C:\Users\chris\source\repos\FinalProject\Debug\FinalProject.exe

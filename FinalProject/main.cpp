@@ -133,6 +133,7 @@ vector<sprite> uiSprites;
 int lookingAt;
 vec2Int lookTile;
 int lookSprite;
+int frontSprite;
 char* dbg = new char[64];
 vector<int> spriteOrder;
 vector<double> spriteDist;
@@ -218,7 +219,8 @@ void onWindowCreated() {
 	loadSprite("resources\\textures\\enemy1_1.bmp", "enemy1_1");
 	loadSprite("resources\\textures\\enemy1_2.bmp", "enemy1_2");
 	loadSprite("resources\\textures\\enemy1_3.bmp", "enemy1_3");
-
+	
+	
 	// Default player stats
 	pStats = {
 		100,								// HP
@@ -227,19 +229,19 @@ void onWindowCreated() {
 		100,								// Max AP
 		3,									// Strength
 		1,									// Defense
-		{									// Attacks that the player posesses
-			FLAME,
-			LASER_GUN,
-			SUPER,
-			SUPER,
-			FLAME,
-			LASER_GUN,
-			SUPER,
-			SUPER
-		},
 		0,									// XP
 		100,								// Max XP
-		1									// Level
+		1,									// Level
+		{									// Attacks that the player posesses
+			A_FLAME,
+			A_LASER_GUN,
+			A_SUPER,
+		},
+		{									// Items that the player posesses
+			I_POTION,
+			I_POTION,
+			I_POTION
+		}
 	};
 
 	enemy mutant = {
@@ -247,7 +249,7 @@ void onWindowCreated() {
 		1,									// Strength
 		1,									// Defense
 		75,									// XP to reward the player once defeated
-		{ BASIC },							// Attacks that the enemy posesses
+		{ A_BASIC },							// Attacks that the enemy posesses
 		"Mutant"							// Enemy name
 	};
 
@@ -256,7 +258,7 @@ void onWindowCreated() {
 		2,
 		2,
 		110,
-		{ BASIC, BITE },
+		{ A_BASIC, A_BITE },
 		"Warrior"
 	};
 
@@ -265,28 +267,28 @@ void onWindowCreated() {
 		getSprite("enemy_1"),
 		getSprite("enemy_2"),
 		getSprite("enemy_3"),
-	}, 0.0, 0.75, 16, 0.75, 1, mutant });
+	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
 
 	sprites3d.push_back({ { 18.5, 14.5 }, 0, {
 		getSprite("enemy_0"),
 		getSprite("enemy_1"),
 		getSprite("enemy_2"),
 		getSprite("enemy_3"),
-	}, 0.0, 0.75, 16, 0.75, 1, mutant });
+	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
 
 	sprites3d.push_back({ { 16.5, 6.5 }, 0,{
 		getSprite("enemy1_0"),
 		getSprite("enemy1_1"),
 		getSprite("enemy1_2"),
 		getSprite("enemy1_3"),
-	}, 0.0, 0.75, 16, 0.75, 1, warrior });
+	}, 0.0, 0.75, 16, 0.75, "warrior", 1, warrior });
 
 	sprites3d.push_back({ { 18.5, 8.5 }, 0, {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
-	}, 0.0, 0.5, 32, 0.5});
+	}, 0.0, 0.5, 32, 0.5, "chest" });
 
 	spriteDist.resize(sprites3d.size());
 	spriteOrder.resize(sprites3d.size());
@@ -755,6 +757,8 @@ void renderEnvironment() {
 									lookSprite = spriteOrder[i];
 								draw(x, y, character, color - 1);
 							}
+							if (x == SCREEN_WIDTH / 2 && y == SCREEN_HEIGHT / 2)
+								frontSprite = spriteOrder[i];
 						}
 					}
 				}
@@ -903,6 +907,7 @@ void update() {
 			if (!keys[0x44].held && !keys[0x41].held) rotIntensity = 0;
 			if (keys[0x45].pressed) {
 				// Key E was pressed
+				
 			}
 
 			// Opening/closing doors based off of distance between player and door
@@ -945,6 +950,9 @@ void update() {
 				// Key Space was pressed
 				if (lookSprite >= 0 && sprites3d[lookSprite].type == 1)
 					battleTransition();
+				if (frontSprite >= 0 && sprites3d[frontSprite].name == "chest") {
+					sprites3d[frontSprite].position.x += 10000;
+				}
 			}
 
 		}
@@ -1149,18 +1157,18 @@ void update() {
 
 		// Capture key presses for selection (W and S)
 		if (keys[0x57].pressed) {
-			if(battleData.battleMenu == 1)
+			if(battleData.battleMenu  > 0)
 				if (battleData.scrollPos - selectedButton == 0 && selectedButton > 0)
 					battleData.scrollPos--;
 			selectedButton--;
 		}
 		if (keys[0x53].pressed) {
-			if (battleData.battleMenu == 1)
+			if (battleData.battleMenu > 0)
 				if (selectedButton - battleData.scrollPos == 2 && selectedButton < maxMenuItems-1)
 					battleData.scrollPos++;
 			selectedButton++;
 		}
-		if (battleData.battleMenu == 0) {
+		if (battleData.battleMenu > 0) {
 			if (selectedButton > maxMenuItems - 1) selectedButton = 0;
 			if (selectedButton < 0) selectedButton = maxMenuItems - 1;
 		} else {
@@ -1209,13 +1217,29 @@ void update() {
 		if (battleData.battleMenu == 1) {
 			drawSpriteTransparent(menuPos.x+16, menuPos.y-8, getUiSprite("battle_menu_half"));
 
-			for (int i = battleData.scrollPos; i < battleData.scrollPos + 3; i++) {
+			int sz = 3;
+			if (pStats.items.size() < sz) sz = pStats.items.size();
+			for (int i = battleData.scrollPos; i < battleData.scrollPos + sz; i++) {
 				printText(pStats.attacks[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8*(i - battleData.scrollPos), DEFAULT, "chars_small");
 			}
 
 			if (keys[VK_BACK].pressed) {
 				battleData.battleMenu = 0;
 				selectedButton = 1;
+				maxMenuItems = 3;
+			}
+		} else if (battleData.battleMenu == 2) {
+			drawSpriteTransparent(menuPos.x + 16, menuPos.y - 8, getUiSprite("battle_menu_half"));
+
+			int sz = 3;
+			if (pStats.items.size() < sz) sz = pStats.items.size();
+			for (int i = battleData.scrollPos; i < battleData.scrollPos + sz; i++) {
+				printText(pStats.items[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8 * (i - battleData.scrollPos), DEFAULT, "chars_small");
+			}
+
+			if (keys[VK_BACK].pressed) {
+				battleData.battleMenu = 0;
+				selectedButton = 2;
 				maxMenuItems = 3;
 			}
 		}
@@ -1257,6 +1281,12 @@ void update() {
 					maxMenuItems = pStats.attacks.size();
 					battleData.scrollPos = 0;
 				}
+				if (selectedButton == 2) {
+					battleData.battleMenu = 2;
+					selectedButton = 0;
+					maxMenuItems = pStats.items.size();
+					battleData.scrollPos = 0;
+				}
 			} else if (battleData.battleMenu == 1) {
 				attack pAttack = pStats.attacks[selectedButton];
 				if (pStats.ap >= pAttack.apCost) {
@@ -1271,6 +1301,13 @@ void update() {
 					battleData.timerFrame = frame;
 					battleData.msgShown = true;
 				}
+			} else if (battleData.battleMenu == 2) {
+				item pItem = pStats.items[selectedButton];
+				pItem.action();
+				battleData.battleMenu = 0;
+				selectedButton = 0;
+				maxMenuItems = 3;
+				battleData.turn = 1;
 			}
 		}
 

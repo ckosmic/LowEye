@@ -8,6 +8,32 @@ struct attack {
 	char* name;
 };
 
+class item {
+private:
+	void(*fptr_void)() = NULL;
+	void(*fptr_int)(int) = NULL;
+public:
+	char name[MAX_PATH];
+
+	item(const char* itemName, void(*func)(int)) {
+		strcpy(name, itemName);
+		fptr_int = func;
+	}
+
+	item(const char* itemName, void(*func)()) {
+		strcpy(name, itemName);
+		fptr_void = func;
+	}
+
+	void action(int val) {
+		(*fptr_int)(val);
+	}
+
+	void action() {
+		(*fptr_void)();
+	}
+};
+
 struct enemy {
 	int maxHp;
 	int strength;
@@ -25,6 +51,7 @@ struct sprite3d {
 	double size;				// The scale of the sprite
 	int offset;					// The Y offset of the sprite
 	double collisionRadius;		// The radius of player-sprite collision
+	char* name;					// Name of sprite3d
 	int type;					// Type of sprite (0 - default, 1 - enemy)
 	enemy enemyType;			// Type of enemy (used if type == 1)
 };
@@ -46,10 +73,11 @@ struct playerStats {
 	int maxAp;
 	int strength;
 	int defense;
-	vector<attack> attacks;
 	int xp;
 	int maxXp;
 	int level;
+	vector<attack> attacks;
+	vector<item> items;
 };
 
 struct enemyStats {
@@ -62,38 +90,67 @@ struct enemyStats {
 	int xp;
 };
 
-const attack BASIC = {
+struct obtainable {
+	attack oAttack;
+
+};
+
+extern playerStats pStats;
+
+#pragma region Attacks
+
+const attack A_BASIC = {
 	3,									// Power
 	0,									// Type of attack
 	1,									// Randomness addition to power
 	0,									// AP cost
 	"Attack"							// Name of attack
 };
-const attack FLAME = {
+const attack A_FLAME = {
 	10,									// Power
 	0,									// Type of attack
 	2,									// Randomness addition to power
 	5,
 	"Flame"								// Name of attack
 };
-const attack LASER_GUN = {
+const attack A_FREEZE = {
+	10,
+	0,
+	2,
+	5,
+	"Freeze"
+};
+const attack A_LASER_GUN = {
 	9,
 	0,
 	2,
 	4,
 	"Laser Gun"
 };
-const attack SUPER = {
+const attack A_SUPER = {
 	100,
 	0,
 	0,
 	0,
 	"Super"
 };
-const attack BITE = {
+const attack A_BITE = {
 	5,
 	0,
 	3,
 	100,
 	"Bite"
 };
+
+#pragma endregion
+
+#pragma region Items
+
+void modifyPlayerHp(int amount) {
+	pStats.hp += amount;
+}
+
+item I_POTION("Potion", modifyPlayerHp);
+
+#pragma endregion
+
