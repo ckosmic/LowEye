@@ -5,6 +5,7 @@
 #define doorId 4
 #define DISPLAY_FPS 0
 
+#pragma region Map arrays
 int worldMap[mapWidth][mapHeight] =
 {
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
@@ -116,6 +117,7 @@ int floorMap[mapWidth][mapHeight] =
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 };
+#pragma endregion
 
 double currentDistLT[SCREEN_HEIGHT+1];
 
@@ -151,6 +153,7 @@ vector<flag> flags;
 
 int main() {
 	srand(time(NULL));
+	// Load config from settings.ini (located at same location as executable)
 	loadConfig("PIXEL_SCALE=4\nNOISE_REDUCTION=0\nOPTIMIZE_TEXTURES=0\n");
 	PIXEL_SCALE = stoi(getConfigValue("PIXEL_SCALE"));
 	setupWindow();
@@ -212,6 +215,7 @@ int getFlagFramesLeft(string name) {
 	return -1;
 }
 
+// Called when the game's window is created (from gameEngine.h)
 void onWindowCreated() {
 	setWindowTitle(L"LowEye");
 
@@ -317,7 +321,7 @@ void onWindowCreated() {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
-	}, 0.0, 0.5, 32, 0.5, "chest" });
+	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { &I_POTION, NULL } });
 
 	spriteDist.resize(sprites3d.size());
 	spriteOrder.resize(sprites3d.size());
@@ -451,6 +455,15 @@ void battleTransition() {
 	battleData.scrollPos = 0;
 	battleData.timerFrame = frame;
 	maxMenuItems = 3;
+}
+
+void removeItem(char* name) {
+	for (int i = 0; i < pStats.items.size(); i++) {
+		if (strcmp(pStats.items[i].name, name) == 0) {
+			pStats.items.erase(pStats.items.begin() + i);
+			break;
+		}
+	}
 }
 
 // Heavily modified version of Lode's Raycasting Tutorial for the Final Project
@@ -859,17 +872,9 @@ void enemyTick(int newHp, int x, int y, double scale, sprite spr) {
 	drawSpriteScaled(x + offset.x, y + offset.y, scale, spr);
 }
 
-void removeItem(char* name) {
-	for (int i = 0; i < pStats.items.size(); i++) {
-		if (strcmp(pStats.items[i].name, name) == 0) {
-			pStats.items.erase(pStats.items.begin() + i);
-			break;
-		}
-	}
-}
-
-// Runs every frame
+// Runs every frame (from gameEngine.h)
 void update() {
+#pragma region Main game rendering
 	if (menu == 0) {
 		bool transFlag = false;
 		if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
@@ -887,8 +892,8 @@ void update() {
 			// Key input (movement, rotation, interaction)
 			double ppx = 0;
 			double ppy = 0;
+			// Key W is down
 			if (keys[0x57].held) {
-				// Key W is down
 				velocity = lerp(velocity, 1, deltaTime * 3);
 
 				ppx = playerPos.x + playerDir.x * moveSpeed;
@@ -904,8 +909,8 @@ void update() {
 					isSpriteCollided(ppx, ppy) == false)
 					playerPos.y += playerDir.y * moveSpeed * velocity;
 			}
+			// Key S is down
 			if (keys[0x53].held) {
-				// Key S is down
 				velocity = lerp(velocity, 1, deltaTime * 3);
 
 				ppx = playerPos.x - playerDir.x * moveSpeed;
@@ -921,8 +926,8 @@ void update() {
 					isSpriteCollided(ppx, ppy) == false)
 					playerPos.y -= playerDir.y * moveSpeed * velocity;
 			}
+			// Key A is down
 			if (keys[0x44].held) {
-				// Key A is down
 				double oldDirX = playerDir.x;
 				playerDir.x = playerDir.x * cos(-rotSpeed) - playerDir.y * sin(-rotSpeed);
 				playerDir.y = oldDirX * sin(-rotSpeed) + playerDir.y * cos(-rotSpeed);
@@ -931,8 +936,8 @@ void update() {
 				camPlane.y = oldPlaneX * sin(-rotSpeed) + camPlane.y * cos(-rotSpeed);
 				rotIntensity = lerp(rotIntensity, 1, deltaTime * 3);
 			}
+			// Key D is down
 			if (keys[0x41].held) {
-				// Key D is down
 				double oldDirX = playerDir.x;
 				playerDir.x = playerDir.x * cos(rotSpeed) - playerDir.y * sin(rotSpeed);
 				playerDir.y = oldDirX * sin(rotSpeed) + playerDir.y * cos(rotSpeed);
@@ -941,11 +946,11 @@ void update() {
 				camPlane.y = oldPlaneX * sin(rotSpeed) + camPlane.y * cos(rotSpeed);
 				rotIntensity = lerp(rotIntensity, 1, deltaTime * 3);
 			}
-			if (!keys[0x44].held && !keys[0x41].held) rotIntensity = 0;
+			// Key E was pressed
 			if (keys[0x45].pressed) {
-				// Key E was pressed
 				
 			}
+			if (!keys[0x44].held && !keys[0x41].held) rotIntensity = 0;
 
 			// Opening/closing doors based off of distance between player and door
 			for (int y = 0; y < mapHeight; y++) {
@@ -983,15 +988,21 @@ void update() {
 				printText(dbg, 1, 1, UPPER);
 			}
 
+			// Key Space was pressed
 			if (keys[VK_SPACE].pressed) {
-				// Key Space was pressed
+				// If sprite that the player is directly looking at is enemy, start battle
 				if (lookSprite >= 0 && sprites3d[lookSprite].type == 1)
 					battleTransition();
-				if (frontSprite >= 0 && sprites3d[frontSprite].name == "chest") {
+				// If sprite that the player is facing (doesn't have to be directly looking at) is a chest, open it
+				if (frontSprite >= 0 && sprites3d[frontSprite].name == "chest" && sprites3d[frontSprite].type == 2) {
 					sprites3d[frontSprite].position.x += 10000;
+					if (sprites3d[frontSprite].obtain.oAttack != NULL) {
+						pStats.attacks.push_back(*(sprites3d[frontSprite].obtain.oAttack));
+					} else if (sprites3d[frontSprite].obtain.oItem != NULL) {
+						pStats.items.push_back(*(sprites3d[frontSprite].obtain.oItem));
+					}
 				}
 			}
-
 		}
 
 		if (keys[0x1B].pressed) {
@@ -1002,6 +1013,8 @@ void update() {
 		if (transFlag) {
 			readyForClrTrans();
 		}
+#pragma endregion
+#pragma region Title screen
 	} else if (menu == 1) {	//Main menu
 
 		paused = false;
@@ -1059,6 +1072,8 @@ void update() {
 		if (transFlag) {
 			readyForClrTrans();
 		}
+#pragma endregion
+#pragma region Options menu
 	} else if (menu == 2) {	// Options menu
 
 		bool transFlag = false;
@@ -1101,6 +1116,8 @@ void update() {
 		if (transFlag) {
 			readyForClrTrans();
 		}
+#pragma endregion
+#pragma region Menu to black transition
 	} else if (menu == 3) {	// Transition from menu to black screen
 
 		srand(3);
@@ -1116,6 +1133,8 @@ void update() {
 
 		if (selectedButton >= SCREEN_WIDTH/2)
 			menu = nextMenu;
+#pragma endregion
+#pragma region Black to menu transition
 	} else if (menu == 4) {	// Transition from black to new menu
 
 		srand(4);
@@ -1138,6 +1157,8 @@ void update() {
 			selectedButton = 0;
 			srand(time(0));
 		}
+#pragma endregion
+#pragma region Pause screen
 	} else if (menu == 5) {	// Pause screen
 
 		maxMenuItems = 3;
@@ -1183,6 +1204,8 @@ void update() {
 			// Key ESC was pressed
 			pauseGame();
 		}
+#pragma endregion
+#pragma region Battle screen
 	} else if (menu == 6) {	// Battle screen
 
 		bool transFlag = false;
@@ -1260,7 +1283,7 @@ void update() {
 			drawSpriteTransparent(menuPos.x+16, menuPos.y-8, getUiSprite("battle_menu_half"));
 
 			int sz = 3;
-			if (pStats.attacks.size() < sz) sz = pStats.items.size();
+			if (pStats.attacks.size() < sz) sz = pStats.attacks.size();
 			for (int i = battleData.scrollPos; i < battleData.scrollPos + sz; i++) {
 				printText(pStats.attacks[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8*(i - battleData.scrollPos), DEFAULT, "chars_small");
 			}
@@ -1286,8 +1309,8 @@ void update() {
 			}
 		}
 
+		// Draw selection arrow
 		if (battleData.turn == 0) {
-			// Draw selection arrow
 			char arrowFrame[7];
 			sprintf(arrowFrame, "arrow%d", ((frame / 4) % 8));
 			int buttonLoc = menuPos.y + 2 + ((selectedButton - battleData.scrollPos) * 8);
@@ -1330,28 +1353,32 @@ void update() {
 					battleData.scrollPos = 0;
 				}
 			} else if (battleData.battleMenu == 1) {
-				attack pAttack = pStats.attacks[selectedButton];
-				if (pStats.ap >= pAttack.apCost) {
-					battleData.prevEHp -= ceil((double)pStats.strength / battleData.eStats.defense) * (pAttack.power + (rand() % (pAttack.randomness + 1)));
+				if (pStats.attacks.size() > 0) {
+					attack pAttack = pStats.attacks[selectedButton];
+					if (pStats.ap >= pAttack.apCost) {
+						battleData.prevEHp -= ceil((double)pStats.strength / battleData.eStats.defense) * (pAttack.power + (rand() % (pAttack.randomness + 1)));
+						battleData.battleMenu = 0;
+						selectedButton = 0;
+						maxMenuItems = 3;
+						battleData.turn = 1;
+						battleData.timerFrame = frame;
+						pStats.ap -= pAttack.apCost;
+					} else {
+						battleData.timerFrame = frame;
+						setFlag("msgShown", 240);
+					}
+				}
+			} else if (battleData.battleMenu == 2) {
+				if (pStats.items.size() > 0) {
+					item pItem = pStats.items[selectedButton];
+					pItem.action();
 					battleData.battleMenu = 0;
 					selectedButton = 0;
 					maxMenuItems = 3;
 					battleData.turn = 1;
 					battleData.timerFrame = frame;
-					pStats.ap -= pAttack.apCost;
-				} else {
-					battleData.timerFrame = frame;
-					setFlag("msgShown", 240);
+					removeItem(pItem.name);
 				}
-			} else if (battleData.battleMenu == 2) {
-				item pItem = pStats.items[selectedButton];
-				pItem.action();
-				battleData.battleMenu = 0;
-				selectedButton = 0;
-				maxMenuItems = 3;
-				battleData.turn = 1;
-				battleData.timerFrame = frame;
-				removeItem(pItem.name);
 			}
 		}
 
@@ -1389,7 +1416,9 @@ void update() {
 		if (transFlag) {
 			readyForClrTrans();
 		}
-	} else if (menu == 7) {
+#pragma endregion
+#pragma region Player statistics screen
+	} else if (menu == 7) {		// Player stats
 		bool transFlag = false;
 		if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
 			transFlag = true;
@@ -1420,7 +1449,10 @@ void update() {
 			readyForClrTrans();
 		}
 	}
+#pragma endregion
 
+
+	// Update flags
 	for (int i = 0; i < flags.size(); i++) {
 		if (flags[i].endFrame <= frame) {
 			flags.erase(flags.begin() + i);
