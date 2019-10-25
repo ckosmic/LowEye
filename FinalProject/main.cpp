@@ -273,7 +273,7 @@ void onWindowCreated() {
 			A_SUPER,
 		},
 		{									// Items that the player posesses
-			I_POTION,
+			I_POTION,I_POTION,I_POTION,I_POTION,I_TEST,I_TEST
 		}
 	};
 
@@ -282,7 +282,7 @@ void onWindowCreated() {
 		1,									// Strength
 		1,									// Defense
 		75,									// XP to reward the player once defeated
-		{ A_BASIC },							// Attacks that the enemy posesses
+		{ A_BASIC },						// Attacks that the enemy posesses
 		"Mutant"							// Enemy name
 	};
 
@@ -321,7 +321,7 @@ void onWindowCreated() {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
-	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { &I_POTION, NULL } });
+	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { NULL, &I_POTION } });
 
 	spriteDist.resize(sprites3d.size());
 	spriteOrder.resize(sprites3d.size());
@@ -872,6 +872,33 @@ void enemyTick(int newHp, int x, int y, double scale, sprite spr) {
 	drawSpriteScaled(x + offset.x, y + offset.y, scale, spr);
 }
 
+int getNumStackedItems() {
+	int num = 0;
+	vector<string> tmpItems;
+	for (int i = 0; i < pStats.items.size(); i++) {
+		if (find(tmpItems.begin(), tmpItems.end(), pStats.items[i].name) == tmpItems.end()) {
+			num++;
+			tmpItems.push_back(pStats.items[i].name);
+		}
+	}
+	return num;
+}
+
+vector<item> getStackedItems() {
+	vector<item> stacked;
+	vector<string> tmpItems;
+	for (int i = 0; i < pStats.items.size(); i++) {
+		if (find(tmpItems.begin(), tmpItems.end(), pStats.items[i].name) == tmpItems.end()) {
+			tmpItems.push_back(pStats.items[i].name);
+			stacked.push_back(pStats.items[i]);
+		}
+		else {
+			
+		}
+	}
+	return stacked;
+}
+
 // Runs every frame (from gameEngine.h)
 void update() {
 #pragma region Main game rendering
@@ -1283,7 +1310,7 @@ void update() {
 			drawSpriteTransparent(menuPos.x+16, menuPos.y-8, getUiSprite("battle_menu_half"));
 
 			int sz = 3;
-			if (pStats.attacks.size() < sz) sz = pStats.attacks.size();
+			if (maxMenuItems < sz) sz = maxMenuItems;
 			for (int i = battleData.scrollPos; i < battleData.scrollPos + sz; i++) {
 				printText(pStats.attacks[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8*(i - battleData.scrollPos), DEFAULT, "chars_small");
 			}
@@ -1298,8 +1325,14 @@ void update() {
 
 			int sz = 3;
 			if (pStats.items.size() < sz) sz = pStats.items.size();
+			vector<string> strs;
+			int txtPos = 0;
 			for (int i = battleData.scrollPos; i < battleData.scrollPos + sz; i++) {
-				printText(pStats.items[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8 * (i - battleData.scrollPos), DEFAULT, "chars_small");
+				if (find(strs.begin(), strs.end(), pStats.items[i].name) == strs.end()) {
+					printText(pStats.items[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8 * (txtPos - battleData.scrollPos), DEFAULT, "chars_small");
+					txtPos++;
+				}
+				strs.push_back(pStats.items[i].name);
 			}
 
 			if (keys[VK_BACK].pressed) {
@@ -1349,7 +1382,7 @@ void update() {
 				if (selectedButton == 2) {
 					battleData.battleMenu = 2;
 					selectedButton = 0;
-					maxMenuItems = pStats.items.size();
+					maxMenuItems = getNumStackedItems();
 					battleData.scrollPos = 0;
 				}
 			} else if (battleData.battleMenu == 1) {

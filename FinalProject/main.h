@@ -15,6 +15,7 @@ private:
 	int val = -69420;
 public:
 	char name[MAX_PATH];
+	int quantity;
 
 	item(const char* itemName, void(*func)(int), int v) {
 		strcpy(name, itemName);
@@ -175,6 +176,7 @@ void modifyPlayerHp(int amount) {
 }
 
 item I_POTION("Potion", modifyPlayerHp, 50);
+item I_TEST("Test", modifyPlayerHp, 0);
 
 #pragma endregion
 
