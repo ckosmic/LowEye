@@ -881,21 +881,29 @@ int getNumStackedItems() {
 			tmpItems.push_back(pStats.items[i].name);
 		}
 	}
+
+	return num;
+}
+
+int getNumItems(char* itemName) {
+	int num = 0;
+	for (int i = 0; i < pStats.items.size(); i++) {
+		if (strcmp(pStats.items[i].name, itemName) == 0) num++;
+	}
+
 	return num;
 }
 
 vector<item> getStackedItems() {
 	vector<item> stacked;
-	vector<string> tmpItems;
+	vector<string> itemNames;
 	for (int i = 0; i < pStats.items.size(); i++) {
-		if (find(tmpItems.begin(), tmpItems.end(), pStats.items[i].name) == tmpItems.end()) {
-			tmpItems.push_back(pStats.items[i].name);
+		if (find(itemNames.begin(), itemNames.end(), pStats.items[i].name) == itemNames.end()) {
+			itemNames.push_back(pStats.items[i].name);
 			stacked.push_back(pStats.items[i]);
 		}
-		else {
-			
-		}
 	}
+
 	return stacked;
 }
 
@@ -1322,17 +1330,20 @@ void update() {
 			}
 		} else if (battleData.battleMenu == 2) {
 			drawSpriteTransparent(menuPos.x + 16, menuPos.y - 8, getUiSprite("battle_menu_half"));
+			vector<item> stacked = getStackedItems();
 
 			int sz = 3;
-			if (pStats.items.size() < sz) sz = pStats.items.size();
-			vector<string> strs;
-			int txtPos = 0;
+			if (stacked.size() < sz) sz = stacked.size();
 			for (int i = battleData.scrollPos; i < battleData.scrollPos + sz; i++) {
-				if (find(strs.begin(), strs.end(), pStats.items[i].name) == strs.end()) {
-					printText(pStats.items[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8 * (txtPos - battleData.scrollPos), DEFAULT, "chars_small");
-					txtPos++;
-				}
-				strs.push_back(pStats.items[i].name);
+				rect itemTextMask = {
+					menuPos.x + 20,
+					menuPos.y - 4 + 8 * (i - battleData.scrollPos),
+					50,
+					7
+				};
+				printText(stacked[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8 * (i - battleData.scrollPos), DEFAULT, "chars_small", &itemTextMask);
+				sprintf(dbg, "%d", getNumItems(stacked[i].name));
+				printText(dbg, menuPos.x + 76, menuPos.y - 4 + 8 * (i - battleData.scrollPos), DEFAULT, "chars_small");
 			}
 
 			if (keys[VK_BACK].pressed) {
@@ -1403,7 +1414,8 @@ void update() {
 				}
 			} else if (battleData.battleMenu == 2) {
 				if (pStats.items.size() > 0) {
-					item pItem = pStats.items[selectedButton];
+					vector<item> stacked = getStackedItems();
+					item pItem = stacked[selectedButton];
 					pItem.action();
 					battleData.battleMenu = 0;
 					selectedButton = 0;

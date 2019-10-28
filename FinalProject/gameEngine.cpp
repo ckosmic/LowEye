@@ -96,6 +96,25 @@ void drawSprite(int x, int y, sprite spr) {
 }
 
 /*
+drawSpriteMasked: draws a sprite into the UI buffer
+
+int x: x position of the sprite from the left side
+int y: y position of the sprite from the top side
+sprite spr: reference to a sprite object
+rect mask: a rectangle mask to draw the sprite in
+*/
+void drawSpriteMasked(int x, int y, rect mask, sprite spr) {
+	int width = spr.width;
+	int height = spr.height;
+	for (int i = 0; i < width*height; i++) {
+		int dx = x + i % width;
+		int dy = y + floor(i / width);
+		if(dx >= mask.x && dx <= mask.x + mask.width && dy >= mask.y && dy <= mask.y + mask.height)
+			drawUI(dx, dy, spr.chars[i], spr.colors[i]);
+	}
+}
+
+/*
 drawSpriteScaled: draws a scaled sprite into the UI buffer
 
 int x: x position of the sprite from the left side
@@ -130,6 +149,25 @@ void drawSpriteTransparent(int x, int y, sprite spr) {
 	for (int i = 0; i < width*height; i++) {
 		if (spr.colors[i] > 0)
 			drawUI(x + i % width, y + floor(i / width), spr.chars[i], spr.colors[i]);
+	}
+}
+
+/*
+drawSpriteMasked: draws a sprite into the UI buffer
+
+int x: x position of the sprite from the left side
+int y: y position of the sprite from the top side
+sprite spr: reference to a sprite object
+rect mask: a rectangle mask to draw the sprite in
+*/
+void drawSpriteMaskedTransparent(int x, int y, rect mask, sprite spr) {
+	int width = spr.width;
+	int height = spr.height;
+	for (int i = 0; i < width*height; i++) {
+		int dx = x + i % width;
+		int dy = y + floor(i / width);
+		if (dx >= mask.x && dx <= mask.x + mask.width && dy >= mask.y && dy <= mask.y + mask.height && spr.colors[i] > 0)
+			drawUI(dx, dy, spr.chars[i], spr.colors[i]);
 	}
 }
 
@@ -302,8 +340,10 @@ char* text: a pointer to a string to be printed
 int x: the x position of the text
 int y: the y position of the text
 LETTERCASE letterCase: the case of the text (UPPER, DEFAULT, LOWER)
+char* font: the fontset to use (fonts are located in resources/textures/[font_name])
+rect* mask: the rectangular mask to draw the text in
 */
-void printText(char* text, int x, int y, LETTERCASE letterCase, char* font) {
+void printText(char* text, int x, int y, LETTERCASE letterCase, char* font, rect* mask) {
 	for (int i = 0; i < strlen(text); i++) {
 		if (text[i] == ' ') {
 			x += 4;
@@ -331,7 +371,10 @@ void printText(char* text, int x, int y, LETTERCASE letterCase, char* font) {
 			}
 			
 			if (letter.valid) {
-				drawSpriteTransparent(x, y, letter);
+				if (mask == 0)
+					drawSpriteTransparent(x, y, letter);
+				else
+					drawSpriteMaskedTransparent(x, y, *mask, letter);
 				x += letter.width;
 			}
 
@@ -339,6 +382,10 @@ void printText(char* text, int x, int y, LETTERCASE letterCase, char* font) {
 			delete[] sprName;
 		}
 	}
+}
+
+void printText(char* text, int x, int y, LETTERCASE letterCase, char* font) {
+	printText(text, x, y, letterCase, font, NULL);
 }
 
 void printText(char* text, int x, int y, LETTERCASE letterCase) {

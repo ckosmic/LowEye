@@ -61,6 +61,12 @@ struct config {
 	vector<string> attributes;
 	vector<string> values;
 };
+struct rect {
+	int x;
+	int y;
+	int width;
+	int height;
+};
 
 const sprite INVALID_SPRITE = { NULL, NULL, NULL, NULL, false, "INVALID_SPRITE" };
 
@@ -78,7 +84,9 @@ void draw(int index, wchar_t character, WORD color);
 void drawUI(int x, int y, wchar_t character, WORD color);
 void drawSprite(int x, int y, sprite spr);
 void drawSpriteScaled(int x, int y, double scale, sprite spr);
+void drawSpriteMasked(int x, int y, rect mask, sprite spr);
 void drawSpriteTransparent(int x, int y, sprite spr);
+void drawSpriteMaskedTransparent(int x, int y, rect mask, sprite spr);
 void drawSpriteScaledTransparent(int x, int y, double scale, sprite spr);
 void mergeBuffers();
 void line(int x1, int y1, int x2, int y2, wchar_t character, WORD color);
@@ -91,6 +99,7 @@ void clearScreen();
 void clearUI();
 void printText(char* text, int x, int y, LETTERCASE letterCase);
 void printText(char* text, int x, int y, LETTERCASE letterCase, char* font);
+void printText(char* text, int x, int y, LETTERCASE letterCase, char* font, rect* mask);
 bool loadSprite(char* fileName, string name);
 bool loadSprite(char* fileName, string name, bool characterBank);
 sprite getSprite(string name);

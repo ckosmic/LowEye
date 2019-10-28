@@ -25,16 +25,18 @@ c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\mai
 c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(828): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
 c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(868): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
 c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(869): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1158): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1244): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1286): warning C4018: '<': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1300): warning C4018: '<': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1340): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1359): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1390): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1412): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1456): warning C4018: '<': signed/unsigned mismatch
-c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1457): warning C4018: '<=': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(878): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(890): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(900): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1193): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1279): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1336): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1384): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1403): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1435): warning C4244: '-=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1457): warning C4244: '*=': conversion from 'double' to 'int', possible loss of data
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1501): warning C4018: '<': signed/unsigned mismatch
+c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(1502): warning C4018: '<=': signed/unsigned mismatch
 c:\users\christian\documents\visual studio 2017\projects\loweye\finalproject\main.cpp(176): warning C4715: 'getUiSprite': not all control paths return a value
   FinalProject.vcxproj -> C:\Users\Christian\Documents\Visual Studio 2017\Projects\LowEye\Debug\FinalProject.exe
   FinalProject.vcxproj -> C:\Users\Christian\Documents\Visual Studio 2017\Projects\LowEye\Debug\FinalProject.pdb (Partial PDB)
