@@ -175,7 +175,25 @@ void modifyPlayerHp(int amount) {
 	if (pStats.hp > pStats.maxXp) pStats.hp = pStats.maxHp;
 }
 
+void modifyPlayerMaxHp(int amount) {
+	setFlag("potionFx", 100);
+	pStats.maxHp += amount;
+	pStats.hp = pStats.maxHp;
+}
+
+void modifyPlayerMaxAp(int amount) {
+	setFlag("energyFx", 100);
+	pStats.maxAp += amount;
+	pStats.ap = pStats.maxAp;
+}
+
 item I_POTION("Potion", modifyPlayerHp, 50);
+item I_POTION2("Potion II", modifyPlayerHp, 100);
+item I_POTION3("Potion III", modifyPlayerHp, 200);
+item I_MAXHP("HP Up", modifyPlayerMaxHp, 50);
+item I_MAXHP2("HP Up II", modifyPlayerMaxHp, 100);
+item I_MAXAP("AP Up", modifyPlayerMaxAp, 50);
+item I_MAXAP2("AP Up II", modifyPlayerMaxAp, 100);
 item I_TEST("Test", modifyPlayerHp, 0);
 
 #pragma endregion

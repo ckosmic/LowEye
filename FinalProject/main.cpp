@@ -273,7 +273,7 @@ void onWindowCreated() {
 			A_SUPER,
 		},
 		{									// Items that the player posesses
-			I_POTION,I_POTION,I_POTION,I_POTION,I_TEST,I_TEST
+			I_POTION,I_POTION2,I_POTION3,I_MAXHP,I_MAXHP2,I_MAXAP,I_MAXAP2
 		}
 	};
 
@@ -1252,20 +1252,24 @@ void update() {
 
 		// Capture key presses for selection (W and S)
 		if (keys[0x57].pressed) {
-			if(battleData.battleMenu  > 0)
-				if (battleData.scrollPos - selectedButton == 0 && selectedButton > 0)
-					battleData.scrollPos--;
+			if (battleData.scrollPos - selectedButton == 0 && selectedButton > 0)
+				battleData.scrollPos--;
 			selectedButton--;
 		}
 		if (keys[0x53].pressed) {
-			if (battleData.battleMenu > 0)
-				if (selectedButton - battleData.scrollPos == 2 && selectedButton < maxMenuItems-1)
-					battleData.scrollPos++;
+			if (selectedButton - battleData.scrollPos == 2 && selectedButton < maxMenuItems - 1)
+				battleData.scrollPos++;
 			selectedButton++;
 		}
 		if (battleData.battleMenu > 0) {
-			if (selectedButton > maxMenuItems - 1) selectedButton = 0;
-			if (selectedButton < 0) selectedButton = maxMenuItems - 1;
+			if (selectedButton > maxMenuItems - 1) {
+				selectedButton = 0;
+				battleData.scrollPos = 0;
+			}
+			if (selectedButton < 0) {
+				selectedButton = maxMenuItems - 1;
+				battleData.scrollPos = maxMenuItems - 3;
+			}
 		} else {
 			if (selectedButton > maxMenuItems - 1) selectedButton = maxMenuItems - 1;
 			if (selectedButton < 0) selectedButton = 0;
@@ -1313,6 +1317,14 @@ void update() {
 				}
 			}
 		}
+		if (getFlag("energyFx")) {
+			for (int y = -1; y < 6; y++) {
+				for (int x = -1; x < 35; x++) {
+					int rnd = rand() % (int((100 - (double)getFlagFramesLeft("energyFx")) / 10) + 1);
+					if (rnd == 0) drawUI(x + menuPos.x + 118, y + menuPos.y + 12, PIXEL_SHADE0, (FOREGROUND_RED | FOREGROUND_INTENSITY) + 1);
+				}
+			}
+		}
 		
 		if (battleData.battleMenu == 1) {
 			drawSpriteTransparent(menuPos.x+16, menuPos.y-8, getUiSprite("battle_menu_half"));
@@ -1327,6 +1339,7 @@ void update() {
 				battleData.battleMenu = 0;
 				selectedButton = 1;
 				maxMenuItems = 3;
+				battleData.scrollPos = 0;
 			}
 		} else if (battleData.battleMenu == 2) {
 			drawSpriteTransparent(menuPos.x + 16, menuPos.y - 8, getUiSprite("battle_menu_half"));
@@ -1350,6 +1363,7 @@ void update() {
 				battleData.battleMenu = 0;
 				selectedButton = 2;
 				maxMenuItems = 3;
+				battleData.scrollPos = 0;
 			}
 		}
 
@@ -1412,6 +1426,7 @@ void update() {
 						setFlag("msgShown", 240);
 					}
 				}
+				battleData.scrollPos = 0;
 			} else if (battleData.battleMenu == 2) {
 				if (pStats.items.size() > 0) {
 					vector<item> stacked = getStackedItems();
@@ -1424,6 +1439,7 @@ void update() {
 					battleData.timerFrame = frame;
 					removeItem(pItem.name);
 				}
+				battleData.scrollPos = 0;
 			}
 		}
 
