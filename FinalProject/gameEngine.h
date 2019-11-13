@@ -21,12 +21,13 @@ using namespace std;
 #define SCREEN_HEIGHT 128
 #define BUFFER_SIZE SCREEN_WIDTH*SCREEN_HEIGHT
 #define FPS 60
-#define PIXEL_SHADE0 0x2588
-#define PIXEL_SHADE1 0x2593
-#define PIXEL_SHADE2 0x2592
-#define PIXEL_SHADE3 0x2591
 #define DEBUG_MODE 0
 #define PI 3.14159265
+
+const wchar_t PIXEL_SHADE0 = 0x2588;
+const wchar_t PIXEL_SHADE1 = 0x2593;
+const wchar_t PIXEL_SHADE2 = 0x2592;
+const wchar_t PIXEL_SHADE3 = 0x2591;
 
 enum LETTERCASE {
 	UPPER,

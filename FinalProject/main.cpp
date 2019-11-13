@@ -161,6 +161,92 @@ int main() {
 	return 0;
 }
 
+item getItemByName(string name) {
+	for (int i = 0; i < sizeof(itemBank); i++) {
+		if (string(itemBank[i].name) == name) 
+			return itemBank[i];
+	}
+}
+
+void saveSaveFile() {
+	string data = "";
+
+	data.append("PLAYER_X="); data.append(to_string(playerPos.x)); data.append("\n");
+	data.append("PLAYER_Y="); data.append(to_string(playerPos.y)); data.append("\n");
+	data.append("PLAYER_DIR_X="); data.append(to_string(playerDir.x)); data.append("\n");
+	data.append("PLAYER_DIR_Y="); data.append(to_string(playerDir.y)); data.append("\n");
+	data.append("PLAYER_AP="); data.append(to_string(pStats.ap)); data.append("\n");
+	data.append("PLAYER_DEFENSE="); data.append(to_string(pStats.ap)); data.append("\n");
+	data.append("PLAYER_HP="); data.append(to_string(pStats.hp)); data.append("\n");
+	data.append("PLAYER_LEVEL="); data.append(to_string(pStats.level)); data.append("\n");
+	data.append("PLAYER_MAXAP="); data.append(to_string(pStats.maxAp)); data.append("\n");
+	data.append("PLAYER_MAXHP="); data.append(to_string(pStats.maxHp)); data.append("\n");
+	data.append("PLAYER_MAXXP="); data.append(to_string(pStats.maxXp)); data.append("\n");
+	data.append("PLAYER_STRENGTH="); data.append(to_string(pStats.strength)); data.append("\n");
+	data.append("PLAYER_XP="); data.append(to_string(pStats.xp)); data.append("\n");
+	data.append("CAMPLANE_X="); data.append(to_string(camPlane.x)); data.append("\n");
+	data.append("CAMPLANE_Y="); data.append(to_string(camPlane.y)); data.append("\n");
+	for (int i = 0; i < sprites3d.size(); i++) {
+		if (sprites3d[i].active == false) {
+			data.append("INACTIVE_SPRITE="); data.append(to_string(sprites3d[i].id)); data.append("\n");
+		}
+	}
+	for (int i = 0; i < pStats.items.size(); i++) {
+		string iName = string(pStats.items[i].name);
+		replace(iName.begin(), iName.end(), ' ', '_');
+		data.append("PLAYER_ITEM="); data.append(iName); data.append("\n");
+	}
+
+	ofstream conf("save_data.dat");
+	conf << data;
+	conf.close();
+}
+
+void loadSaveFile() {
+	ifstream config("save_data.dat");
+	if (config.is_open()) {
+		char attribute[256];
+		char v[256];
+		while (config.getline(attribute, 256, '=') && config.getline(v, 256, '\n')) {
+			string a = string(attribute);
+
+			if (a == "PLAYER_X") playerPos.x = atof(v);
+			if (a == "PLAYER_Y") playerPos.y = atof(v);
+			if (a == "PLAYER_DIR_X") playerDir.x = atof(v);
+			if (a == "PLAYER_DIR_Y") playerDir.y = atof(v);
+			if (a == "PLAYER_AP") pStats.ap = atoi(v);
+			if (a == "PLAYER_DEFENSE") pStats.defense = atoi(v);
+			if (a == "PLAYER_HP") pStats.hp = atoi(v);
+			if (a == "PLAYER_LEVEL") pStats.level = atoi(v);
+			if (a == "PLAYER_MAXAP") pStats.maxAp = atoi(v);
+			if (a == "PLAYER_MAXHP") pStats.maxHp = atoi(v);
+			if (a == "PLAYER_MAXXP") pStats.maxXp = atoi(v);
+			if (a == "PLAYER_STRENGTH") pStats.strength = atoi(v);
+			if (a == "PLAYER_XP") pStats.xp = atoi(v);
+			if (a == "CAMPLANE_X") camPlane.x = atof(v);
+			if (a == "CAMPLANE_Y") camPlane.y = atof(v);
+			if (a == "INACTIVE_SPRITE") {
+				for (int i = 0; i < sprites3d.size(); i++) {
+					if (sprites3d[i].id == atoi(v))
+						sprites3d[i].active = false;
+				}
+			}
+			if (a == "PLAYER_ITEM") {
+				for (int i = 0; i < sprites3d.size(); i++) {
+					if (sprites3d[i].id == atoi(v))
+						sprites3d[i].active = false;
+				}
+			}
+		}
+	}
+	else {
+		saveSaveFile();
+		loadSaveFile();
+	}
+
+	config.close();
+}
+
 void loadUiSprite(char* path, string name) {
 	loadSprite(path, name);
 	uiSprites.push_back(getSprite(name));
@@ -213,6 +299,11 @@ int getFlagFramesLeft(string name) {
 		}
 	}
 	return -1;
+}
+
+void addSprite3d(sprite3d spr) {
+	spr.id = sprites3d.size();
+	sprites3d.push_back(spr);
 }
 
 // Called when the game's window is created (from gameEngine.h)
@@ -277,6 +368,7 @@ void onWindowCreated() {
 		}
 	};
 
+	// Initialize enemy types
 	enemy mutant = {
 		100,								// Max HP
 		1,									// Strength
@@ -295,28 +387,29 @@ void onWindowCreated() {
 		"Warrior"
 	};
 
-	sprites3d.push_back({ { 20.5, 10.5 }, 0, {
+	// Add 3D sprites to the scene
+	addSprite3d({ { 20.5, 10.5 }, 0, {
 		getSprite("enemy_0"),
 		getSprite("enemy_1"),
 		getSprite("enemy_2"),
 		getSprite("enemy_3"),
 	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
 
-	sprites3d.push_back({ { 18.5, 14.5 }, 0, {
+	addSprite3d({ { 18.5, 14.5 }, 0, {
 		getSprite("enemy_0"),
 		getSprite("enemy_1"),
 		getSprite("enemy_2"),
 		getSprite("enemy_3"),
 	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
 
-	sprites3d.push_back({ { 16.5, 6.5 }, 0,{
+	addSprite3d({ { 16.5, 6.5 }, 0,{
 		getSprite("enemy1_0"),
 		getSprite("enemy1_1"),
 		getSprite("enemy1_2"),
 		getSprite("enemy1_3"),
 	}, 0.0, 0.75, 16, 0.75, "warrior", 1, warrior });
 
-	sprites3d.push_back({ { 18.5, 8.5 }, 0, {
+	addSprite3d({ { 18.5, 8.5 }, 0, {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
@@ -354,6 +447,10 @@ void onWindowCreated() {
 	loadUiSprite("resources\\textures\\ui\\battle_menu_items.bmp", "battle_menu_items");
 	loadUiSprite("resources\\textures\\ui\\battle_menu_abilities.bmp", "battle_menu_abilities");
 	loadUiSprite("resources\\textures\\ui\\battle_menu_hp.bmp", "battle_menu_hp");
+
+	loadUiSprite("resources\\textures\\ui\\button_continue.bmp", "button_continue");
+	loadUiSprite("resources\\textures\\ui\\button_quitgame.bmp", "button_quitgame");
+	loadUiSprite("resources\\textures\\ui\\button_border_large.bmp", "button_border_large");
 
 	loadSprite("resources\\textures\\ui\\arrow0.bmp", "arrow0");
 	loadSprite("resources\\textures\\ui\\arrow1.bmp", "arrow1");
@@ -418,7 +515,7 @@ void combSort(vector<int> &order, vector<double> &dist, int amount) {
 
 bool isSpriteCollided(double x1, double x2) {
 	for (int i = 0; i < sprites3d.size(); i++) {
-		if (distance(x1, x2, sprites3d[i].position.x, sprites3d[i].position.y) <= sprites3d[i].collisionRadius)
+		if (sprites3d[i].active && distance(x1, x2, sprites3d[i].position.x, sprites3d[i].position.y) <= sprites3d[i].collisionRadius)
 			return true;
 	}
 	return false;
@@ -455,6 +552,13 @@ void battleTransition() {
 	battleData.scrollPos = 0;
 	battleData.timerFrame = frame;
 	maxMenuItems = 3;
+}
+
+void gameOver() {
+	menu = 8;
+	battleData.timerFrame = frame;
+	maxMenuItems = 2;
+	selectedButton = 0;
 }
 
 void removeItem(char* name) {
@@ -739,68 +843,70 @@ void renderEnvironment() {
 		if (spriteDist[i] <= 100) {
 			sprite3d rotSprite = sprites3d[spriteOrder[i]];
 
-			if (rotSprite.rotation > 180)
-				sprites3d[spriteOrder[i]].rotation = -180;
-			if(rotSprite.rotation < -180) 
-				sprites3d[spriteOrder[i]].rotation = 180;
+			if (rotSprite.active) {
+				if (rotSprite.rotation > 180)
+					sprites3d[spriteOrder[i]].rotation = -180;
+				if (rotSprite.rotation < -180)
+					sprites3d[spriteOrder[i]].rotation = 180;
 
-			vec2 spritePos;
-			spritePos.x = rotSprite.position.x - playerPos.x;
-			spritePos.y = rotSprite.position.y - playerPos.y;
+				vec2 spritePos;
+				spritePos.x = rotSprite.position.x - playerPos.x;
+				spritePos.y = rotSprite.position.y - playerPos.y;
 
-			double inverse = 1.0 / (camPlane.x * playerDir.y - playerDir.x * camPlane.y);
+				double inverse = 1.0 / (camPlane.x * playerDir.y - playerDir.x * camPlane.y);
 
-			vec2 transform;
-			transform.x = inverse * (playerDir.y * spritePos.x - playerDir.x * spritePos.y);
-			transform.y = inverse * (-camPlane.y * spritePos.x + camPlane.x * spritePos.y);
+				vec2 transform;
+				transform.x = inverse * (playerDir.y * spritePos.x - playerDir.x * spritePos.y);
+				transform.y = inverse * (-camPlane.y * spritePos.x + camPlane.x * spritePos.y);
 
-			int spriteX = int((SCREEN_WIDTH / 2) * (1 + transform.x / transform.y));
+				int spriteX = int((SCREEN_WIDTH / 2) * (1 + transform.x / transform.y));
 
-			int spriteMove = int(rotSprite.offset / transform.y);
+				int spriteMove = int(rotSprite.offset / transform.y);
 
-			int spriteHeight = abs(int(SCREEN_HEIGHT / (transform.y)));
-			int drawStartY = -spriteHeight / 2 + SCREEN_HEIGHT / 2 + spriteMove;
-			if (drawStartY < 0) drawStartY = 0;
-			int drawEndY = spriteHeight / 2 + SCREEN_HEIGHT / 2 + spriteMove;
-			if (drawEndY > SCREEN_HEIGHT) drawEndY = SCREEN_HEIGHT;
+				int spriteHeight = abs(int(SCREEN_HEIGHT / (transform.y)));
+				int drawStartY = -spriteHeight / 2 + SCREEN_HEIGHT / 2 + spriteMove;
+				if (drawStartY < 0) drawStartY = 0;
+				int drawEndY = spriteHeight / 2 + SCREEN_HEIGHT / 2 + spriteMove;
+				if (drawEndY > SCREEN_HEIGHT) drawEndY = SCREEN_HEIGHT;
 
-			int spriteWidth = abs(int(SCREEN_HEIGHT / (transform.y)));
-			int drawStartX = -spriteWidth / 2 + spriteX;
-			if (drawStartX < 0) drawStartX = 0;
-			int drawEndX = spriteWidth / 2 + spriteX;
-			if (drawEndX > SCREEN_WIDTH) drawEndX = SCREEN_WIDTH;
+				int spriteWidth = abs(int(SCREEN_HEIGHT / (transform.y)));
+				int drawStartX = -spriteWidth / 2 + spriteX;
+				if (drawStartX < 0) drawStartX = 0;
+				int drawEndX = spriteWidth / 2 + spriteX;
+				if (drawEndX > SCREEN_WIDTH) drawEndX = SCREEN_WIDTH;
 
-			double spDiff = rotSprite.rotation - (atan2(spritePos.y, spritePos.x) * (180.0 / PI) + 180.0);
-			// Clamp sprite-player rotation between 0 and 360
-			if (spDiff > 360) spDiff -= 360;
-			if (spDiff < 0) spDiff += 360;
+				double spDiff = rotSprite.rotation - (atan2(spritePos.y, spritePos.x) * (180.0 / PI) + 180.0);
+				// Clamp sprite-player rotation between 0 and 360
+				if (spDiff > 360) spDiff -= 360;
+				if (spDiff < 0) spDiff += 360;
 
-			spriteWidth *= rotSprite.size;
-			spriteHeight *= rotSprite.size;
+				spriteWidth *= rotSprite.size;
+				spriteHeight *= rotSprite.size;
 
-			if (spDiff >= 315.0 || spDiff < 45.0) rotSprite.graphic = 0;
-			if (spDiff >= 45.0 && spDiff < 135.0) rotSprite.graphic = 1;
-			if (spDiff >= 135.0 && spDiff < 225.0) rotSprite.graphic = 2;
-			if (spDiff >= 225.0 && spDiff < 315.0) rotSprite.graphic = 3;
+				if (spDiff >= 315.0 || spDiff < 45.0) rotSprite.graphic = 0;
+				if (spDiff >= 45.0 && spDiff < 135.0) rotSprite.graphic = 1;
+				if (spDiff >= 135.0 && spDiff < 225.0) rotSprite.graphic = 2;
+				if (spDiff >= 225.0 && spDiff < 315.0) rotSprite.graphic = 3;
 
-			sprite drawSprite = rotSprite.sprites[rotSprite.graphic];
-			for (int x = drawStartX; x < drawEndX; x++) {
-				int texX = int(256 * (x - (-spriteWidth / 2 + spriteX)) * drawSprite.width / spriteWidth) / 256;
-				if (transform.y > 0 && x >= 0 && x < SCREEN_WIDTH && transform.y < zbuffer[x]) {
-					for (int y = drawStartY; y < drawEndY; y++) {
-						int d = (y - spriteMove) * 256 - SCREEN_HEIGHT * 128 + spriteHeight * 128;
-						int texY = ((d * drawSprite.height) / spriteHeight) / 256;
-						if (texY < drawSprite.height && texX < drawSprite.width
-							&& texY > -1 && texX > -1) {
-							WORD color = drawSprite.colors[drawSprite.width * texY + texX];
-							wchar_t character = drawSprite.chars[drawSprite.width * texY + texX];
-							if (color > 0) {
+				sprite drawSprite = rotSprite.sprites[rotSprite.graphic];
+				for (int x = drawStartX; x < drawEndX; x++) {
+					int texX = int(256 * (x - (-spriteWidth / 2 + spriteX)) * drawSprite.width / spriteWidth) / 256;
+					if (transform.y > 0 && x >= 0 && x < SCREEN_WIDTH && transform.y < zbuffer[x]) {
+						for (int y = drawStartY; y < drawEndY; y++) {
+							int d = (y - spriteMove) * 256 - SCREEN_HEIGHT * 128 + spriteHeight * 128;
+							int texY = ((d * drawSprite.height) / spriteHeight) / 256;
+							if (texY < drawSprite.height && texX < drawSprite.width
+								&& texY > -1 && texX > -1) {
+								WORD color = drawSprite.colors[drawSprite.width * texY + texX];
+								wchar_t character = drawSprite.chars[drawSprite.width * texY + texX];
+								if (color > 0) {
+									if (x == SCREEN_WIDTH / 2 && y == SCREEN_HEIGHT / 2)
+										lookSprite = spriteOrder[i];
+									draw(x, y, character, color - 1);
+								}
 								if (x == SCREEN_WIDTH / 2 && y == SCREEN_HEIGHT / 2)
-									lookSprite = spriteOrder[i];
-								draw(x, y, character, color - 1);
+									frontSprite = spriteOrder[i];
 							}
-							if (x == SCREEN_WIDTH / 2 && y == SCREEN_HEIGHT / 2)
-								frontSprite = spriteOrder[i];
 						}
 					}
 				}
@@ -983,9 +1089,16 @@ void update() {
 			}
 			// Key E was pressed
 			if (keys[0x45].pressed) {
-				
+				gameOver();
 			}
 			if (!keys[0x44].held && !keys[0x41].held) rotIntensity = 0;
+
+			if (keys[VK_F1].pressed) {
+				saveSaveFile();
+			}
+			if (keys[VK_F2].pressed) {
+				loadSaveFile();
+			}
 
 			// Opening/closing doors based off of distance between player and door
 			for (int y = 0; y < mapHeight; y++) {
@@ -1022,6 +1135,9 @@ void update() {
 				sprintf(dbg, "%d", int(1 / deltaTime));
 				printText(dbg, 1, 1, UPPER);
 			}
+
+			//sprintf(dbg, "%s", getItemByName("Potion I").name);
+			//printText(dbg, 1, 1, LOWER);
 
 			// Key Space was pressed
 			if (keys[VK_SPACE].pressed) {
@@ -1158,7 +1274,7 @@ void update() {
 		srand(3);
 		for (int i = 0; i < SCREEN_HEIGHT; i++) {
 			int rnd = rand();
-			int speed = (rnd % 8 + 3);
+			int speed = (rnd % 8 + 8);
 			for (int j = 0; j < speed; j++) {
 				draw(SCREEN_WIDTH + 32 + j - (selectedButton * speed) - (rnd % 32 + 1), i, PIXEL_SHADE0, 0);
 			}
@@ -1175,7 +1291,7 @@ void update() {
 		srand(4);
 		for (int i = 0; i < SCREEN_HEIGHT; i++) {
 			int rnd = rand();
-			int speed = (rnd % 8 + 3);
+			int speed = (rnd % 8 + 8);
 			for (int j = 0; j < speed; j++) {
 				int x = SCREEN_WIDTH + 32 + j - (selectedButton * speed) - (rnd % 32 + 1);
 				int index = i * SCREEN_WIDTH + x;
@@ -1200,7 +1316,7 @@ void update() {
 
 		// Resume button
 		drawSprite(SCREEN_WIDTH / 2 - uiSprites[11].width / 2, SCREEN_HEIGHT / 2 - uiSprites[11].height / 2 - 18, uiSprites[11]);
-		// Quit button
+		// Stats button
 		drawSprite(SCREEN_WIDTH / 2 - getUiSprite("button_stats").width / 2, SCREEN_HEIGHT / 2 - getUiSprite("button_stats").height / 2, getUiSprite("button_stats"));
 		// Quit button
 		drawSprite(SCREEN_WIDTH / 2 - uiSprites[2].width / 2, SCREEN_HEIGHT / 2 - uiSprites[2].height / 2 + 18, uiSprites[2]);
@@ -1465,7 +1581,7 @@ void update() {
 			mergeBuffers();
 			clearUI();
 			nextMenu = 0;
-			sprites3d[lookSprite].position.x += 10000;
+			sprites3d[lookSprite].active = false;
 			pStats.xp += battleData.eStats.xp;
 			while(pStats.xp >= pStats.maxXp) {
 				pStats.level++;
@@ -1508,6 +1624,67 @@ void update() {
 
 		if (transFlag) {
 			readyForClrTrans();
+		}
+#pragma endregion
+#pragma region Game over screen
+	} else if (menu == 8) {		// Game over screen
+		clearScreen();
+		clearUI();
+
+		int tx = 47, ty = SCREEN_HEIGHT / 2 - 3 + battleData.scrollPos;
+		int dframe = frame - battleData.timerFrame;
+
+		if (dframe > 300 && battleData.scrollPos > -40) battleData.scrollPos--;
+
+		printText("Game Over", tx, ty, UPPER);
+
+		int twidth = 70, theight = 10;
+		for (int y = ty; y < ty + theight; y++) {
+			for (int x = tx; x < tx + twidth; x++) {
+				int index = y * SCREEN_WIDTH + x;
+				if (uiBuffer[index].Char.UnicodeChar > 0) {
+					if (dframe < 51) uiBuffer[index].Char.UnicodeChar = 0;
+					if (dframe > 50 && dframe < 101) uiBuffer[index].Char.UnicodeChar = PIXEL_SHADE3;
+					if (dframe > 100 && dframe < 151) uiBuffer[index].Char.UnicodeChar = PIXEL_SHADE2;
+					if (dframe > 150 && dframe < 201) {
+						uiBuffer[index].Char.UnicodeChar = PIXEL_SHADE1;
+						uiBuffer[index].Attributes ^= FOREGROUND_INTENSITY;
+					}
+					if (dframe > 250) uiBuffer[index].Char.UnicodeChar = PIXEL_SHADE0;
+				}
+			}
+		}
+
+		if (battleData.scrollPos <= -40) {
+			// Capture key presses for selection (W and S)
+			if (keys[0x57].pressed) selectedButton--;
+			if (keys[0x53].pressed) selectedButton++;
+			if (selectedButton > maxMenuItems - 1) selectedButton = 0;
+			if (selectedButton < 0) selectedButton = maxMenuItems - 1;
+
+			drawSprite(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 17, getUiSprite("button_continue"));
+			drawSprite(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 1, getUiSprite("button_quitgame"));
+
+			// Draw selection border
+			int buttonLoc = SCREEN_HEIGHT / 2 + (18 * selectedButton) - 17;
+			drawSpriteTransparent(SCREEN_WIDTH / 2 - 50, buttonLoc, getUiSprite("button_border_large"));
+
+			if (selectedButton == 0) {
+				printText("Continue from last save.", 29, 100, DEFAULT, "chars_small");
+				if (keys[VK_RETURN].pressed) {
+					menu = 0;
+					loadSaveFile();
+				}
+			} else if (selectedButton == 1) {
+				printText("Close the game.", 48, 100, DEFAULT, "chars_small");
+				if (keys[VK_RETURN].pressed) {
+					exit(0);
+				}
+			}
+		} else {
+			if (keys[VK_RETURN].pressed) {
+				battleData.scrollPos = -40;
+			}
 		}
 	}
 #pragma endregion

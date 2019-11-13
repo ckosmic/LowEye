@@ -1,4 +1,5 @@
 #include "gameEngine.h"
+#include <algorithm>
 
 struct attack {
 	int power;
@@ -62,6 +63,9 @@ struct sprite3d {
 	int type;					// Type of sprite (0 - default, 1 - enemy, 2 - chest)
 	enemy enemyType;			// Type of enemy (used if type == 1)
 	obtainable obtain;			// Obtainable item or attack (used if type == 2)
+
+	int id;
+	bool active = true;
 };
 
 struct mapNode {
@@ -195,6 +199,10 @@ item I_MAXHP2("HP Up II", modifyPlayerMaxHp, 100);
 item I_MAXAP("AP Up", modifyPlayerMaxAp, 50);
 item I_MAXAP2("AP Up II", modifyPlayerMaxAp, 100);
 item I_TEST("Test", modifyPlayerHp, 0);
+
+item itemBank[8] = {
+	I_POTION, I_POTION2, I_POTION3, I_MAXHP, I_MAXHP2, I_MAXAP, I_MAXAP2, I_TEST
+};
 
 #pragma endregion
 
