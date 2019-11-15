@@ -451,6 +451,7 @@ void onWindowCreated() {
 	loadUiSprite("resources\\textures\\ui\\button_continue.bmp", "button_continue");
 	loadUiSprite("resources\\textures\\ui\\button_quitgame.bmp", "button_quitgame");
 	loadUiSprite("resources\\textures\\ui\\button_border_large.bmp", "button_border_large");
+	loadUiSprite("resources\\textures\\ui\\button_newgame.bmp", "button_newgame");
 
 	loadSprite("resources\\textures\\ui\\arrow0.bmp", "arrow0");
 	loadSprite("resources\\textures\\ui\\arrow1.bmp", "arrow1");
@@ -1207,8 +1208,10 @@ void update() {
 		// Capture enter key to select button
 		if (keys[0x0D].pressed) {
 			if (selectedButton == 0) {
-				menu = 0;
+				menu = 3;
+				mergeBuffers();
 				clearUI();
+				nextMenu = 9;
 			}
 			if (selectedButton == 1) {
 				menu = 3;
@@ -1238,6 +1241,7 @@ void update() {
 
 		drawSprite(SCREEN_WIDTH - 37, 5, (getConfigValue("NOISE_REDUCTION") == "1") ? uiSprites[8] : uiSprites[7]);
 
+		// Back button
 		drawSprite(SCREEN_WIDTH - 69, SCREEN_HEIGHT - 19, uiSprites[10]);
 
 		if (selectedButton == 0)
@@ -1575,7 +1579,8 @@ void update() {
 			}
 		}
 
-		if (battleData.eStats.hp == 0) {
+		// If enemy HP is zero, end the battle and reward player
+		if (battleData.eStats.hp <= 0) {
 			selectedButton = 0;
 			menu = 3;
 			mergeBuffers();
@@ -1588,6 +1593,11 @@ void update() {
 				pStats.xp = pStats.xp - pStats.maxXp;
 				pStats.maxXp *= 1.5;
 			}
+		}
+
+		//If player HP is zero, game over :(
+		if (pStats.hp <= 0) {
+			gameOver();
 		}
 
 		if (transFlag) {
@@ -1638,6 +1648,7 @@ void update() {
 
 		printText("Game Over", tx, ty, UPPER);
 
+		// Fade in text animation
 		int twidth = 70, theight = 10;
 		for (int y = ty; y < ty + theight; y++) {
 			for (int x = tx; x < tx + twidth; x++) {
@@ -1655,6 +1666,7 @@ void update() {
 			}
 		}
 
+		// When Game Over text has reached the top
 		if (battleData.scrollPos <= -40) {
 			// Capture key presses for selection (W and S)
 			if (keys[0x57].pressed) selectedButton--;
@@ -1686,8 +1698,65 @@ void update() {
 				battleData.scrollPos = -40;
 			}
 		}
+#pragma endregion
+#pragma region New/Load screen
+	} else if (menu == 9) {		// New/Load screen
+
+	bool transFlag = false;
+	if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
+		transFlag = true;
+
+	fillScreen(PIXEL_SHADE2, FOREGROUND_RED);
+	clearUI();
+	maxMenuItems = 3;
+
+	// New game button
+	drawSprite(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 17, getUiSprite("button_newgame"));
+	// Continue button
+	drawSprite(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 1, getUiSprite("button_continue"));
+	// Back button
+	drawSprite(SCREEN_WIDTH - 69, SCREEN_HEIGHT - 19, uiSprites[10]);
+
+	// Draw selection arrow and border
+	char arrowFrame[7];
+	sprintf(arrowFrame, "arrow%d", ((frame / 4) % 8));
+
+	// Draw selection border
+	if (selectedButton == 2) {
+		drawSprite(73, SCREEN_HEIGHT - 19, getSprite(arrowFrame));
+		drawSpriteTransparent(SCREEN_WIDTH - 69, SCREEN_HEIGHT - 19, uiSprites[3]);
+	} else {
+		int buttonLoc = SCREEN_HEIGHT / 2 + (18 * selectedButton) - 17;
+		drawSpriteTransparent(SCREEN_WIDTH / 2 - 50, buttonLoc, getUiSprite("button_border_large"));
+		drawSprite(12, buttonLoc, getSprite(arrowFrame));
+	}
+
+	// Capture key presses for selection (W and S)
+	if (keys[0x57].pressed) selectedButton--;
+	if (keys[0x53].pressed) selectedButton++;
+	if (selectedButton > maxMenuItems - 1) selectedButton = 0;
+	if (selectedButton < 0) selectedButton = maxMenuItems - 1;
+
+	// Capture enter key to select button
+	if (keys[0x0D].pressed) {
+		if (selectedButton == 0) {
+			menu = 0;
+			clearUI();
+		}
+		if (selectedButton == 1) {
+			menu = 0;
+			clearUI();
+			loadSaveFile();
+		}
+		if (selectedButton == 2) menu = 1;
+		selectedButton = 0;
+	}
+
+	if (transFlag) {
+		readyForClrTrans();
 	}
 #pragma endregion
+}
 
 
 	// Update flags
