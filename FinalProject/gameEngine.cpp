@@ -81,6 +81,24 @@ void drawUI(int x, int y, wchar_t character, WORD color) {
 }
 
 /*
+drawRectUI: draws a rectangle to the UI buffer
+
+int x: the left corner of the rect
+int y: the top corner of the rect
+int width: the width of the rect
+int height: the height of the rect
+wchar_t character: the characters of the rect
+WORD color: the color of the rect
+*/
+void drawRectUI(int x, int y, int width, int height, wchar_t character, WORD color) {
+	for (int i = 0; i < height; i++) {
+		for (int j = 0; j < width; j++) {
+			drawUI(x + j, y + i, character, color);
+		}
+	}
+}
+
+/*
 drawSprite: draws a sprite into the UI buffer
 
 int x: x position of the sprite from the left side

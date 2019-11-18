@@ -83,6 +83,7 @@ extern int PIXEL_SCALE;
 void draw(int x, int y, wchar_t character, WORD color);
 void draw(int index, wchar_t character, WORD color);
 void drawUI(int x, int y, wchar_t character, WORD color);
+void drawRectUI(int x, int y, int width, int height, wchar_t character, WORD color);
 void drawSprite(int x, int y, sprite spr);
 void drawSpriteScaled(int x, int y, double scale, sprite spr);
 void drawSpriteMasked(int x, int y, rect mask, sprite spr);

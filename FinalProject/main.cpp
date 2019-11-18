@@ -1,126 +1,9 @@
+// Main game code
+
 #include "main.h"
 
-#define mapWidth 24
-#define mapHeight 24
-#define doorId 4
-#define DISPLAY_FPS 0
-
-#pragma region Map arrays
-int worldMap[mapWidth][mapHeight] =
-{
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,1,4,1,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,4,0,0,0,0,0,0,0,4,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,1,4,1,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-};
-
-double tileTimers[mapWidth][mapHeight] =
-{
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0},
-	{1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0}
-};
-
-int ceilMap[mapWidth][mapHeight] =
-{
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-	{2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2}
-};
-
-int floorMap[mapWidth][mapHeight] =
-{
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-	{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
-};
-#pragma endregion
-
+// Global variables
 double currentDistLT[SCREEN_HEIGHT+1];
-
 vec2 playerPos;
 vec2 playerDir;
 vec2 camPlane;
@@ -150,6 +33,7 @@ double bobIntensity = 0;
 double rotIntensity = 0;
 playerStats pStats;
 vector<flag> flags;
+string messageString;
 
 int main() {
 	srand(time(NULL));
@@ -161,13 +45,23 @@ int main() {
 	return 0;
 }
 
+// Returns an item by passing its display name
 item getItemByName(string name) {
-	for (int i = 0; i < sizeof(itemBank); i++) {
+	for (int i = 0; i < sizeof(itemBank) / sizeof(itemBank[0]); i++) {
 		if (string(itemBank[i].name) == name) 
 			return itemBank[i];
 	}
 }
 
+// Returns an attack (ability) by its display name
+attack getAttackByName(string name) {
+	for (int i = 0; i < sizeof(attackBank) / sizeof(attackBank[0]); i++) {
+		if (string(attackBank[i].name) == name)
+			return attackBank[i];
+	}
+}
+
+// Save game data to save_data.dat
 void saveSaveFile() {
 	string data = "";
 
@@ -196,15 +90,24 @@ void saveSaveFile() {
 		replace(iName.begin(), iName.end(), ' ', '_');
 		data.append("PLAYER_ITEM="); data.append(iName); data.append("\n");
 	}
+	for (int i = 0; i < pStats.attacks.size(); i++) {
+		string iName = string(pStats.attacks[i].name);
+		replace(iName.begin(), iName.end(), ' ', '_');
+		data.append("PLAYER_ABILITY="); data.append(iName); data.append("\n");
+	}
 
 	ofstream conf("save_data.dat");
 	conf << data;
 	conf.close();
 }
 
+// Load game data from save_data.dat
 void loadSaveFile() {
 	ifstream config("save_data.dat");
 	if (config.is_open()) {
+
+		pStats.items.clear();
+
 		char attribute[256];
 		char v[256];
 		while (config.getline(attribute, 256, '=') && config.getline(v, 256, '\n')) {
@@ -232,10 +135,14 @@ void loadSaveFile() {
 				}
 			}
 			if (a == "PLAYER_ITEM") {
-				for (int i = 0; i < sprites3d.size(); i++) {
-					if (sprites3d[i].id == atoi(v))
-						sprites3d[i].active = false;
-				}
+				string iName = string(v);
+				replace(iName.begin(), iName.end(), '_', ' ');
+				pStats.items.push_back(getItemByName(iName));
+			}
+			if (a == "PLAYER_ABILITY") {
+				string iName = string(v);
+				replace(iName.begin(), iName.end(), '_', ' ');
+				pStats.attacks.push_back(getAttackByName(iName));
 			}
 		}
 	}
@@ -247,11 +154,13 @@ void loadSaveFile() {
 	config.close();
 }
 
+// Loads a sprite into the sprite bank and the UI sprite bank
 void loadUiSprite(char* path, string name) {
 	loadSprite(path, name);
 	uiSprites.push_back(getSprite(name));
 }
 
+// Returns a UI sprite from the UI sprite bank
 sprite getUiSprite(string name) {
 	for (int i = 0; i < uiSprites.size(); i++) {
 		if (uiSprites[i].name == name) {
@@ -261,6 +170,7 @@ sprite getUiSprite(string name) {
 	}
 }
 
+// Sets a named flag that will last for a specified amount of frames
 void setFlag(string name, int length) {
 	for (int i = 0; i < flags.size(); i++) {
 		if (flags[i].name == name) {
@@ -275,6 +185,7 @@ void setFlag(string name, int length) {
 	flags.push_back(newFlag);
 }
 
+// Removes a flag prematurely
 void removeFlag(string name) {
 	for (int i = 0; i < flags.size(); i++) {
 		if (flags[i].name == name) {
@@ -283,6 +194,7 @@ void removeFlag(string name) {
 	}
 }
 
+// Returns true if flag exists
 bool getFlag(string name) {
 	for (int i = 0; i < flags.size(); i++) {
 		if (flags[i].name == name) {
@@ -292,6 +204,7 @@ bool getFlag(string name) {
 	return false;
 }
 
+// Gets the amount of frames left until the specified flag gets removed
 int getFlagFramesLeft(string name) {
 	for (int i = 0; i < flags.size(); i++) {
 		if (flags[i].name == name) {
@@ -301,6 +214,7 @@ int getFlagFramesLeft(string name) {
 	return -1;
 }
 
+// Adds a 3D sprite to the 3D sprite bank and assigns an ID to it
 void addSprite3d(sprite3d spr) {
 	spr.id = sprites3d.size();
 	sprites3d.push_back(spr);
@@ -321,16 +235,13 @@ void onWindowCreated() {
 
 	int optimizeTex = stoi(getConfigValue("OPTIMIZE_TEXTURES"));
 
-	// Main wall texture
+	// --Load sprites--
 	loadSprite("resources\\textures\\wall.bmp", "wall1");
-	envTextures.push_back(getSprite("wall1"));
-	// Main floor texture
+	envTextures.push_back(getSprite("wall1"));	// envTextures is used for quick and easy getting of textures
 	loadSprite(optimizeTex ? "resources\\textures\\circle_floor_optimized.bmp" : "resources\\textures\\circle_floor.bmp", "circle_floor");
 	envTextures.push_back(getSprite("circle_floor"));
-	// Main ceiling texture
 	loadSprite(optimizeTex ? "resources\\textures\\ceiling_optimized.bmp" : "resources\\textures\\ceiling.bmp", "ceiling");
 	envTextures.push_back(getSprite("ceiling"));
-	// Door texture
 	loadSprite("resources\\textures\\door.bmp", "door");
 	envTextures.push_back(getSprite("door"));
 	 
@@ -345,83 +256,19 @@ void onWindowCreated() {
 	loadSprite("resources\\textures\\enemy1_1.bmp", "enemy1_1");
 	loadSprite("resources\\textures\\enemy1_2.bmp", "enemy1_2");
 	loadSprite("resources\\textures\\enemy1_3.bmp", "enemy1_3");
-	
-	
-	// Default player stats
-	pStats = {
-		100,								// HP
-		100,								// Max HP
-		100,								// AP
-		100,								// Max AP
-		3,									// Strength
-		1,									// Defense
-		0,									// XP
-		100,								// Max XP
-		1,									// Level
-		{									// Attacks that the player posesses
-			A_FLAME,
-			A_LASER_GUN,
-			A_SUPER,
-		},
-		{									// Items that the player posesses
-			I_POTION,I_POTION2,I_POTION3,I_MAXHP,I_MAXHP2,I_MAXAP,I_MAXAP2
-		}
-	};
 
-	// Initialize enemy types
-	enemy mutant = {
-		100,								// Max HP
-		1,									// Strength
-		1,									// Defense
-		75,									// XP to reward the player once defeated
-		{ A_BASIC },						// Attacks that the enemy posesses
-		"Mutant"							// Enemy name
-	};
+	loadSprite("resources\\textures\\ui\\arrow0.bmp", "arrow0");
+	loadSprite("resources\\textures\\ui\\arrow1.bmp", "arrow1");
+	loadSprite("resources\\textures\\ui\\arrow2.bmp", "arrow2");
+	loadSprite("resources\\textures\\ui\\arrow3.bmp", "arrow3");
+	loadSprite("resources\\textures\\ui\\arrow4.bmp", "arrow4");
+	loadSprite("resources\\textures\\ui\\arrow5.bmp", "arrow5");
+	loadSprite("resources\\textures\\ui\\arrow6.bmp", "arrow6");
+	loadSprite("resources\\textures\\ui\\arrow7.bmp", "arrow7");
 
-	enemy warrior = {
-		125,
-		2,
-		2,
-		110,
-		{ A_BASIC, A_BITE },
-		"Warrior"
-	};
-
-	// Add 3D sprites to the scene
-	addSprite3d({ { 20.5, 10.5 }, 0, {
-		getSprite("enemy_0"),
-		getSprite("enemy_1"),
-		getSprite("enemy_2"),
-		getSprite("enemy_3"),
-	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
-
-	addSprite3d({ { 18.5, 14.5 }, 0, {
-		getSprite("enemy_0"),
-		getSprite("enemy_1"),
-		getSprite("enemy_2"),
-		getSprite("enemy_3"),
-	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
-
-	addSprite3d({ { 16.5, 6.5 }, 0,{
-		getSprite("enemy1_0"),
-		getSprite("enemy1_1"),
-		getSprite("enemy1_2"),
-		getSprite("enemy1_3"),
-	}, 0.0, 0.75, 16, 0.75, "warrior", 1, warrior });
-
-	addSprite3d({ { 18.5, 8.5 }, 0, {
-		getSprite("chest"),
-		getSprite("chest"),
-		getSprite("chest"),
-		getSprite("chest"),
-	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { NULL, &I_POTION } });
-
-	spriteDist.resize(sprites3d.size());
-	spriteOrder.resize(sprites3d.size());
-
-	// UI sprites
+	// --Load UI sprites--
 	loadUiSprite("resources\\textures\\crosshair.bmp", "crosshair");
-	
+
 	loadUiSprite("resources\\textures\\ui\\button_start.bmp", "button_start");
 	loadUiSprite("resources\\textures\\ui\\button_quit.bmp", "button_quit");
 	loadUiSprite("resources\\textures\\ui\\button_border.bmp", "button_border");
@@ -452,21 +299,96 @@ void onWindowCreated() {
 	loadUiSprite("resources\\textures\\ui\\button_quitgame.bmp", "button_quitgame");
 	loadUiSprite("resources\\textures\\ui\\button_border_large.bmp", "button_border_large");
 	loadUiSprite("resources\\textures\\ui\\button_newgame.bmp", "button_newgame");
+	
+	
+	// Initialize default player stats
+	pStats = {
+		100,								// HP
+		100,								// Max HP
+		100,								// AP
+		100,								// Max AP
+		3,									// Strength
+		1,									// Defense
+		0,									// XP
+		100,								// Max XP
+		1,									// Level
+		{									// Attacks that the player posesses
+			A_FLAME,
+			A_LASER_GUN,
+			A_SUPER,
+		},
+		{									// Items that the player posesses
+			I_POTION,I_POTION2,I_POTION3,I_MAXHP,I_MAXHP2,I_MAXAP,I_MAXAP2
+		}
+	};
 
-	loadSprite("resources\\textures\\ui\\arrow0.bmp", "arrow0");
-	loadSprite("resources\\textures\\ui\\arrow1.bmp", "arrow1");
-	loadSprite("resources\\textures\\ui\\arrow2.bmp", "arrow2");
-	loadSprite("resources\\textures\\ui\\arrow3.bmp", "arrow3");
-	loadSprite("resources\\textures\\ui\\arrow4.bmp", "arrow4");
-	loadSprite("resources\\textures\\ui\\arrow5.bmp", "arrow5");
-	loadSprite("resources\\textures\\ui\\arrow6.bmp", "arrow6");
-	loadSprite("resources\\textures\\ui\\arrow7.bmp", "arrow7");
+	// Define & initialize enemy types
+	enemy mutant = {
+		100,								// Max HP
+		1,									// Strength
+		1,									// Defense
+		75,									// XP to reward the player once defeated
+		{ A_BASIC },						// Attacks that the enemy posesses
+		"Mutant"							// Enemy name
+	};
+
+	enemy warrior = {
+		125,
+		2,
+		2,
+		110,
+		{ A_BASIC, A_BITE },
+		"Warrior"
+	};
+
+	// Add 3D sprites to the scene
+	// addSprite3d accepts a sprite3d, adds it to the scene, and assigns an ID to it; used for saving/loading
+	addSprite3d({ { 20.5, 10.5 }, 0, {
+		getSprite("enemy_0"),
+		getSprite("enemy_1"),
+		getSprite("enemy_2"),
+		getSprite("enemy_3"),
+	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
+
+	addSprite3d({ { 18.5, 14.5 }, 0, {
+		getSprite("enemy_0"),
+		getSprite("enemy_1"),
+		getSprite("enemy_2"),
+		getSprite("enemy_3"),
+	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
+
+	addSprite3d({ { 16.5, 6.5 }, 0,{
+		getSprite("enemy1_0"),
+		getSprite("enemy1_1"),
+		getSprite("enemy1_2"),
+		getSprite("enemy1_3"),
+	}, 0.0, 0.75, 16, 0.75, "warrior", 1, warrior });
+
+	addSprite3d({ { 18.5, 8.5 }, 0, {
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { NULL, &I_POTION } });
+
+	addSprite3d({ { 16.5, 8.5 }, 0, {
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { &A_BITE, NULL } });
+
+	// Arrays used for 3D sprite sorting
+	spriteDist.resize(sprites3d.size());
+	spriteOrder.resize(sprites3d.size());
 }
 
+// Returns the distance between two points (who would've guessed)
 double distance(double x1, double y1, double x2, double y2) {
 	return sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2));
 }
 
+// Set up game for pause screen
 void pauseGame() {
 	paused = !paused;
 	if (paused) {
@@ -492,6 +414,7 @@ void pauseGame() {
 	}
 }
 
+// Sorting function used for 3D sprite sorting
 void combSort(vector<int> &order, vector<double> &dist, int amount) {
 	int gap = amount;
 	bool swapped = false;
@@ -514,6 +437,7 @@ void combSort(vector<int> &order, vector<double> &dist, int amount) {
 	}
 }
 
+// Returns true if player is collided with a 3D sprite
 bool isSpriteCollided(double x1, double x2) {
 	for (int i = 0; i < sprites3d.size(); i++) {
 		if (sprites3d[i].active && distance(x1, x2, sprites3d[i].position.x, sprites3d[i].position.y) <= sprites3d[i].collisionRadius)
@@ -522,15 +446,8 @@ bool isSpriteCollided(double x1, double x2) {
 	return false;
 }
 
-bool operator < (const mapNode& mn1, const mapNode& mn2) {
-	return mn1.f < mn2.f;
-}
 
-bool isValidNode(int x, int y) {
-	int id = x + y * mapWidth;
-	return false;
-}
-
+// Set up game for a battle!
 void battleTransition() {
 	selectedButton = 0;
 	menu = 3;
@@ -555,6 +472,7 @@ void battleTransition() {
 	maxMenuItems = 3;
 }
 
+// Set up game for game over :(
 void gameOver() {
 	menu = 8;
 	battleData.timerFrame = frame;
@@ -562,6 +480,7 @@ void gameOver() {
 	selectedButton = 0;
 }
 
+// Removes an item from the player's inventory
 void removeItem(char* name) {
 	for (int i = 0; i < pStats.items.size(); i++) {
 		if (strcmp(pStats.items[i].name, name) == 0) {
@@ -931,6 +850,7 @@ void renderEnvironment() {
 	}
 }
 
+// Draws a value bar to the UI buffer
 void drawHealthBar(int x, int y, int width, int hp, int maxHp, WORD color) {
 	int actualWidth = width * ((double)hp / (double)maxHp);
 	wchar_t characters[3] = {
@@ -954,6 +874,7 @@ void drawHealthBar(int x, int y, int width, int hp, int maxHp, WORD color) {
 	horizLineUI(y + 4, x, x + width + 1, PIXEL_SHADE3, 1);
 }
 
+// Used for screen wipe transition
 void readyForClrTrans() {
 	mergeBuffers();
 	transBuffer = new CHAR_INFO[BUFFER_SIZE];
@@ -965,6 +886,7 @@ void readyForClrTrans() {
 	clearUI();
 }
 
+// Called each frame, used for drawing enemy and its animations
 void enemyTick(int newHp, int x, int y, double scale, sprite spr) {
 	vec2Int offset = { 0, 0 };
 	if (newHp != battleData.eStats.hp) {
@@ -979,6 +901,7 @@ void enemyTick(int newHp, int x, int y, double scale, sprite spr) {
 	drawSpriteScaled(x + offset.x, y + offset.y, scale, spr);
 }
 
+// Get number of unique items in player's inventory
 int getNumStackedItems() {
 	int num = 0;
 	vector<string> tmpItems;
@@ -992,6 +915,7 @@ int getNumStackedItems() {
 	return num;
 }
 
+// Gets the number of a specific item the player has
 int getNumItems(char* itemName) {
 	int num = 0;
 	for (int i = 0; i < pStats.items.size(); i++) {
@@ -1001,6 +925,7 @@ int getNumItems(char* itemName) {
 	return num;
 }
 
+// Returns a vector of unique items only
 vector<item> getStackedItems() {
 	vector<item> stacked;
 	vector<string> itemNames;
@@ -1132,6 +1057,12 @@ void update() {
 			// Draw viewmodel
 			drawSprite(SCREEN_WIDTH - 54 + int(sin((double)frame / 8) * 10 * bobIntensity), SCREEN_HEIGHT - 54 + int(sin((double)frame / 4) * 5 * bobIntensity), getUiSprite("gun1"));
 
+			if (getFlag("getitem")) {
+				drawRectUI(5, 5, SCREEN_WIDTH - 10, 17, PIXEL_SHADE0, FOREGROUND_BLUE);
+				sprintf(dbg, "Received %s.", messageString.c_str());
+				printText(dbg, 10, 9, UPPER);
+			}
+
 			if (DISPLAY_FPS) {
 				sprintf(dbg, "%d", int(1 / deltaTime));
 				printText(dbg, 1, 1, UPPER);
@@ -1147,12 +1078,15 @@ void update() {
 					battleTransition();
 				// If sprite that the player is facing (doesn't have to be directly looking at) is a chest, open it
 				if (frontSprite >= 0 && sprites3d[frontSprite].name == "chest" && sprites3d[frontSprite].type == 2) {
-					sprites3d[frontSprite].position.x += 10000;
+					sprites3d[frontSprite].active = false;
 					if (sprites3d[frontSprite].obtain.oAttack != NULL) {
 						pStats.attacks.push_back(*(sprites3d[frontSprite].obtain.oAttack));
+						messageString = (*(sprites3d[frontSprite].obtain.oAttack)).name;
 					} else if (sprites3d[frontSprite].obtain.oItem != NULL) {
 						pStats.items.push_back(*(sprites3d[frontSprite].obtain.oItem));
+						messageString = (*(sprites3d[frontSprite].obtain.oItem)).name;
 					}
+					setFlag("getitem", 75);
 				}
 			}
 		}
@@ -1211,7 +1145,8 @@ void update() {
 				menu = 3;
 				mergeBuffers();
 				clearUI();
-				nextMenu = 9;
+				//nextMenu = 9;
+				nextMenu = 0;
 			}
 			if (selectedButton == 1) {
 				menu = 3;
