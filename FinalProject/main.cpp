@@ -224,8 +224,10 @@ void addSprite3d(sprite3d spr) {
 void onWindowCreated() {
 	setWindowTitle(L"LowEye");
 
-	playerPos.x = 21.5;
-	playerPos.y = 12.5;
+	menu = 0;
+
+	playerPos.x = 32.5;
+	playerPos.y = 31;
 	playerDir.x = -1;
 	playerDir.y = 0;
 	camPlane.x = 0;
@@ -237,15 +239,18 @@ void onWindowCreated() {
 
 	// --Load sprites--
 	loadSprite("resources\\textures\\wall.bmp", "wall1");
-	envTextures.push_back(getSprite("wall1"));	// envTextures is used for quick and easy getting of textures
+	envTextures.push_back(getSprite("wall1"));	// envTextures is used for quick and easy getting of environmental textures
 	loadSprite(optimizeTex ? "resources\\textures\\circle_floor_optimized.bmp" : "resources\\textures\\circle_floor.bmp", "circle_floor");
 	envTextures.push_back(getSprite("circle_floor"));
 	loadSprite(optimizeTex ? "resources\\textures\\ceiling_optimized.bmp" : "resources\\textures\\ceiling.bmp", "ceiling");
 	envTextures.push_back(getSprite("ceiling"));
 	loadSprite("resources\\textures\\door.bmp", "door");
 	envTextures.push_back(getSprite("door"));
+	loadSprite("resources\\textures\\circle_floor_spill.bmp", "circle_floor_spill");
+	envTextures.push_back(getSprite("circle_floor_spill"));
 	 
 	loadSprite("resources\\textures\\chest.bmp", "chest");
+	loadSprite("resources\\textures\\barrel.bmp", "barrel");
 
 	loadSprite("resources\\textures\\enemy_0.bmp", "enemy_0");
 	loadSprite("resources\\textures\\enemy_1.bmp", "enemy_1");
@@ -299,6 +304,8 @@ void onWindowCreated() {
 	loadUiSprite("resources\\textures\\ui\\button_quitgame.bmp", "button_quitgame");
 	loadUiSprite("resources\\textures\\ui\\button_border_large.bmp", "button_border_large");
 	loadUiSprite("resources\\textures\\ui\\button_newgame.bmp", "button_newgame");
+
+	loadUiSprite("resources\\textures\\ui\\blast.bmp", "blast");
 	
 	
 	// Initialize default player stats
@@ -313,12 +320,11 @@ void onWindowCreated() {
 		100,								// Max XP
 		1,									// Level
 		{									// Attacks that the player posesses
-			A_FLAME,
 			A_LASER_GUN,
 			A_SUPER,
 		},
 		{									// Items that the player posesses
-			I_POTION,I_POTION2,I_POTION3,I_MAXHP,I_MAXHP2,I_MAXAP,I_MAXAP2
+			
 		}
 	};
 
@@ -343,40 +349,73 @@ void onWindowCreated() {
 
 	// Add 3D sprites to the scene
 	// addSprite3d accepts a sprite3d, adds it to the scene, and assigns an ID to it; used for saving/loading
-	addSprite3d({ { 20.5, 10.5 }, 0, {
+	/*addSprite3d({ { 20.5, 10.5 }, 0, {
 		getSprite("enemy_0"),
 		getSprite("enemy_1"),
 		getSprite("enemy_2"),
 		getSprite("enemy_3"),
-	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
+	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });*/
 
-	addSprite3d({ { 18.5, 14.5 }, 0, {
+	addSprite3d({ { 24.5, 36.5 }, 0, {
 		getSprite("enemy_0"),
 		getSprite("enemy_1"),
 		getSprite("enemy_2"),
 		getSprite("enemy_3"),
-	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
+	}, -90.0, 0.75, 16, 0.75, "mutant", 1, mutant });
 
-	addSprite3d({ { 16.5, 6.5 }, 0,{
+	addSprite3d({ { 21.5, 49.5 }, 0, {
+		getSprite("enemy_0"),
+		getSprite("enemy_1"),
+		getSprite("enemy_2"),
+		getSprite("enemy_3"),
+	}, -90.0, 0.75, 16, 0.75, "mutant", 1, mutant });
+
+	/*addSprite3d({ { 24.5, 35.5 }, 0,{
 		getSprite("enemy1_0"),
 		getSprite("enemy1_1"),
 		getSprite("enemy1_2"),
 		getSprite("enemy1_3"),
-	}, 0.0, 0.75, 16, 0.75, "warrior", 1, warrior });
+	}, 0.0, 0.75, 16, 0.75, "warrior", 1, warrior });*/
 
-	addSprite3d({ { 18.5, 8.5 }, 0, {
+	addSprite3d({ { 27.5, 35.5 }, 0, {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { NULL, &I_POTION } });
 
-	addSprite3d({ { 16.5, 8.5 }, 0, {
+	addSprite3d({ { 18.5, 39.5 }, 0, {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
-	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { &A_BITE, NULL } });
+	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { &A_FLAME, NULL } });
+
+	addSprite3d({ { 1.5, 45.5 }, 0, {
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { NULL, &I_POTION } });
+
+	addSprite3d({ { 1.5, 43.5 }, 0, {
+		getSprite("barrel"),
+		getSprite("barrel"),
+		getSprite("barrel"),
+		getSprite("barrel"),
+	}, 0.0, 0.75, 16, 0.75, "barrel", 0 });
+	addSprite3d({ { 1.5, 42.5 }, 0, {
+		getSprite("barrel"),
+		getSprite("barrel"),
+		getSprite("barrel"),
+		getSprite("barrel"),
+	}, 0.0, 0.75, 16, 0.75, "barrel", 0 });
+	addSprite3d({ { 2, 37.5 }, 0, {
+		getSprite("barrel"),
+		getSprite("barrel"),
+		getSprite("barrel"),
+		getSprite("barrel"),
+	}, 0.0, 0.75, 16, 0.75, "barrel", 0 });
 
 	// Arrays used for 3D sprite sorting
 	spriteDist.resize(sprites3d.size());
@@ -941,6 +980,8 @@ vector<item> getStackedItems() {
 
 // Runs every frame (from gameEngine.h)
 void update() {
+	bool action = keys[0x0D].pressed || keys[VK_SPACE].pressed;
+
 #pragma region Main game rendering
 	if (menu == 0) {
 		bool transFlag = false;
@@ -1055,11 +1096,11 @@ void update() {
 			drawSprite(SCREEN_WIDTH / 2 - 8, SCREEN_HEIGHT / 2 - 8, getUiSprite("crosshair"));
 
 			// Draw viewmodel
-			drawSprite(SCREEN_WIDTH - 54 + int(sin((double)frame / 8) * 10 * bobIntensity), SCREEN_HEIGHT - 54 + int(sin((double)frame / 4) * 5 * bobIntensity), getUiSprite("gun1"));
+			//drawSprite(SCREEN_WIDTH - 54 + int(sin((double)frame / 8) * 10 * bobIntensity), SCREEN_HEIGHT - 54 + int(sin((double)frame / 4) * 5 * bobIntensity), getUiSprite("gun1"));
 
 			if (getFlag("getitem")) {
 				drawRectUI(5, 5, SCREEN_WIDTH - 10, 17, PIXEL_SHADE0, FOREGROUND_BLUE);
-				sprintf(dbg, "Received %s.", messageString.c_str());
+				sprintf(dbg, "%s", messageString.c_str());
 				printText(dbg, 10, 9, UPPER);
 			}
 
@@ -1081,10 +1122,12 @@ void update() {
 					sprites3d[frontSprite].active = false;
 					if (sprites3d[frontSprite].obtain.oAttack != NULL) {
 						pStats.attacks.push_back(*(sprites3d[frontSprite].obtain.oAttack));
-						messageString = (*(sprites3d[frontSprite].obtain.oAttack)).name;
+						sprintf(dbg, "Received %s.", (*(sprites3d[frontSprite].obtain.oAttack)).name);
+						messageString = dbg;
 					} else if (sprites3d[frontSprite].obtain.oItem != NULL) {
 						pStats.items.push_back(*(sprites3d[frontSprite].obtain.oItem));
-						messageString = (*(sprites3d[frontSprite].obtain.oItem)).name;
+						sprintf(dbg, "Received %s.", (*(sprites3d[frontSprite].obtain.oItem)).name);
+						messageString = dbg;
 					}
 					setFlag("getitem", 75);
 				}
@@ -1113,8 +1156,10 @@ void update() {
 		clearUI();
 		maxMenuItems = 3;
 
+		drawSpriteTransparent(0, 0, getUiSprite("blast"));
+
 		// Logo
-		drawSprite(SCREEN_WIDTH / 2 - uiSprites[4].width / 2, 10, uiSprites[4]);
+		drawSpriteTransparent(SCREEN_WIDTH / 2 - uiSprites[4].width / 2, 10, uiSprites[4]);
 
 		// Start button
 		drawSprite(SCREEN_WIDTH / 2 - uiSprites[1].width / 2, SCREEN_HEIGHT / 2 - uiSprites[1].height / 2 - 5, uiSprites[1]);
@@ -1128,7 +1173,7 @@ void update() {
 		sprintf(arrowFrame, "arrow%d", ((frame/4) % 8));
 		int buttonLoc = SCREEN_HEIGHT / 2 - uiSprites[3].height / 2 + (18 * selectedButton) - 5;
 		drawSpriteTransparent(SCREEN_WIDTH / 2 - uiSprites[3].width / 2, buttonLoc, uiSprites[3]);
-		drawSprite(30, buttonLoc, getSprite(arrowFrame));
+		drawSpriteTransparent(30, buttonLoc, getSprite(arrowFrame));
 
 		// Capture key presses for selection (W and S)
 		if (keys[0x57].pressed) selectedButton--;
@@ -1136,11 +1181,13 @@ void update() {
 		if (selectedButton > maxMenuItems-1) selectedButton = 0;
 		if (selectedButton < 0) selectedButton = maxMenuItems-1;
 
+		drawRectUI(SCREEN_WIDTH - uiSprites[6].width + 1, SCREEN_HEIGHT - uiSprites[6].height - 1, SCREEN_WIDTH - uiSprites[6].width - 1, SCREEN_HEIGHT - uiSprites[6].height + 1, PIXEL_SHADE0, 1);
+
 		// Created by text
-		drawSprite(SCREEN_WIDTH - uiSprites[6].width - 1, SCREEN_HEIGHT - uiSprites[6].height - 1, uiSprites[6]);
+		drawSpriteTransparent(SCREEN_WIDTH - uiSprites[6].width - 1, SCREEN_HEIGHT - uiSprites[6].height - 1, uiSprites[6]);
 
 		// Capture enter key to select button
-		if (keys[0x0D].pressed) {
+		if (action) {
 			if (selectedButton == 0) {
 				menu = 3;
 				mergeBuffers();
@@ -1191,7 +1238,7 @@ void update() {
 		if (selectedButton < 0) selectedButton = maxMenuItems-1;
 
 		// Capture enter key to select button
-		if (keys[0x0D].pressed) {
+		if (action) {
 			if (selectedButton == 0)
 				setConfigValue("NOISE_REDUCTION", to_string(!stoi(getConfigValue("NOISE_REDUCTION"))).c_str());
 			if (selectedButton == 1) {
@@ -1271,7 +1318,7 @@ void update() {
 		drawSpriteTransparent(SCREEN_WIDTH / 2 - uiSprites[3].width / 2, buttonLoc, uiSprites[3]);
 
 		// Capture enter key to select button
-		if (keys[0x0D].pressed) {
+		if (action) {
 			if (selectedButton == 0)
 				pauseGame();
 			if (selectedButton == 1) {
@@ -1444,7 +1491,7 @@ void update() {
 
 
 		// Capture enter key to select action
-		if (keys[VK_RETURN].pressed) {
+		if (action) {
 			if (battleData.battleMenu == 0) {
 				if (selectedButton == 0 && battleData.turn == 0) {
 					battleData.timerFrame = frame;
@@ -1527,6 +1574,10 @@ void update() {
 				pStats.level++;
 				pStats.xp = pStats.xp - pStats.maxXp;
 				pStats.maxXp *= 1.5;
+
+				sprintf(dbg, "Leveled up to LVL %d", pStats.level);
+				messageString = dbg;
+				setFlag("getitem", 125);
 			}
 		}
 
@@ -1561,7 +1612,7 @@ void update() {
 		drawSprite(SCREEN_WIDTH - 69, SCREEN_HEIGHT - 19, uiSprites[10]);
 		drawSpriteTransparent(SCREEN_WIDTH - 69, SCREEN_HEIGHT - 19, uiSprites[3]);
 
-		if (keys[VK_RETURN].pressed) {
+		if (action) {
 			menu = 0;
 			clearUI();
 			paused = false;
@@ -1618,18 +1669,18 @@ void update() {
 
 			if (selectedButton == 0) {
 				printText("Continue from last save.", 29, 100, DEFAULT, "chars_small");
-				if (keys[VK_RETURN].pressed) {
+				if (action) {
 					menu = 0;
 					loadSaveFile();
 				}
 			} else if (selectedButton == 1) {
 				printText("Close the game.", 48, 100, DEFAULT, "chars_small");
-				if (keys[VK_RETURN].pressed) {
+				if (action) {
 					exit(0);
 				}
 			}
 		} else {
-			if (keys[VK_RETURN].pressed) {
+			if (action) {
 				battleData.scrollPos = -40;
 			}
 		}
@@ -1673,7 +1724,7 @@ void update() {
 	if (selectedButton < 0) selectedButton = maxMenuItems - 1;
 
 	// Capture enter key to select button
-	if (keys[0x0D].pressed) {
+	if (action) {
 		if (selectedButton == 0) {
 			menu = 0;
 			clearUI();
