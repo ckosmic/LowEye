@@ -375,6 +375,8 @@ void printText(char* text, int x, int y, LETTERCASE letterCase, char* font, rect
 			if (text[i] == '.') charString = "DEC";
 			if (text[i] == '/') charString = "FORWARD_SLASH";
 			if (text[i] == ':') charString = "COLON";
+			if (text[i] == '\'') charString = "APOSTROPHE";
+			if (text[i] == ',') charString = "COMMA";
 			if (islower(character))
 				sprintf(spritePath, "resources\\textures\\%s\\%ss.bmp", font, charString.c_str());
 			else

@@ -107,6 +107,7 @@ void loadSaveFile() {
 	if (config.is_open()) {
 
 		pStats.items.clear();
+		pStats.attacks.clear();
 
 		char attribute[256];
 		char v[256];
@@ -140,9 +141,9 @@ void loadSaveFile() {
 				pStats.items.push_back(getItemByName(iName));
 			}
 			if (a == "PLAYER_ABILITY") {
-				string iName = string(v);
-				replace(iName.begin(), iName.end(), '_', ' ');
-				pStats.attacks.push_back(getAttackByName(iName));
+				string aName = string(v);
+				replace(aName.begin(), aName.end(), '_', ' ');
+				pStats.attacks.push_back(getAttackByName(aName));
 			}
 		}
 	}
@@ -224,7 +225,10 @@ void addSprite3d(sprite3d spr) {
 void onWindowCreated() {
 	setWindowTitle(L"LowEye");
 
-	menu = 0;
+	menu = 1;
+	//menu = 0;
+	clearUI();
+	loadSaveFile();
 
 	playerPos.x = 32.5;
 	playerPos.y = 31;
@@ -248,6 +252,12 @@ void onWindowCreated() {
 	envTextures.push_back(getSprite("door"));
 	loadSprite("resources\\textures\\circle_floor_spill.bmp", "circle_floor_spill");
 	envTextures.push_back(getSprite("circle_floor_spill"));
+	loadSprite("resources\\textures\\wall2.bmp", "wall2");
+	envTextures.push_back(getSprite("wall2"));
+	loadSprite("resources\\textures\\wall3.bmp", "wall3");
+	envTextures.push_back(getSprite("wall3"));
+	loadSprite("resources\\textures\\wall4.bmp", "wall4");
+	envTextures.push_back(getSprite("wall4"));
 	 
 	loadSprite("resources\\textures\\chest.bmp", "chest");
 	loadSprite("resources\\textures\\barrel.bmp", "barrel");
@@ -262,6 +272,11 @@ void onWindowCreated() {
 	loadSprite("resources\\textures\\enemy1_2.bmp", "enemy1_2");
 	loadSprite("resources\\textures\\enemy1_3.bmp", "enemy1_3");
 
+	loadSprite("resources\\textures\\boss_0.bmp", "boss_0");
+	loadSprite("resources\\textures\\boss_1.bmp", "boss_1");
+	loadSprite("resources\\textures\\boss_2.bmp", "boss_2");
+	loadSprite("resources\\textures\\boss_3.bmp", "boss_3");
+
 	loadSprite("resources\\textures\\ui\\arrow0.bmp", "arrow0");
 	loadSprite("resources\\textures\\ui\\arrow1.bmp", "arrow1");
 	loadSprite("resources\\textures\\ui\\arrow2.bmp", "arrow2");
@@ -270,6 +285,13 @@ void onWindowCreated() {
 	loadSprite("resources\\textures\\ui\\arrow5.bmp", "arrow5");
 	loadSprite("resources\\textures\\ui\\arrow6.bmp", "arrow6");
 	loadSprite("resources\\textures\\ui\\arrow7.bmp", "arrow7");
+
+	loadSprite("resources\\textures\\comp_0.bmp", "comp_0");
+	loadSprite("resources\\textures\\comp_1.bmp", "comp_1");
+	loadSprite("resources\\textures\\comp_2.bmp", "comp_2");
+	loadSprite("resources\\textures\\comp_3.bmp", "comp_3");
+
+	loadSprite("resources\\textures\\torch.bmp", "torch");
 
 	// --Load UI sprites--
 	loadUiSprite("resources\\textures\\crosshair.bmp", "crosshair");
@@ -320,8 +342,7 @@ void onWindowCreated() {
 		100,								// Max XP
 		1,									// Level
 		{									// Attacks that the player posesses
-			A_LASER_GUN,
-			A_SUPER,
+			A_LASER_GUN
 		},
 		{									// Items that the player posesses
 			
@@ -347,14 +368,17 @@ void onWindowCreated() {
 		"Warrior"
 	};
 
+	enemy boss = {
+		1000,
+		5,
+		5,
+		10000,
+		{ A_BASIC, A_BITE, A_GOO, A_OFFLECT },
+		"LowEye"
+	};
+
 	// Add 3D sprites to the scene
 	// addSprite3d accepts a sprite3d, adds it to the scene, and assigns an ID to it; used for saving/loading
-	/*addSprite3d({ { 20.5, 10.5 }, 0, {
-		getSprite("enemy_0"),
-		getSprite("enemy_1"),
-		getSprite("enemy_2"),
-		getSprite("enemy_3"),
-	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });*/
 
 	addSprite3d({ { 24.5, 36.5 }, 0, {
 		getSprite("enemy_0"),
@@ -362,20 +386,79 @@ void onWindowCreated() {
 		getSprite("enemy_2"),
 		getSprite("enemy_3"),
 	}, -90.0, 0.75, 16, 0.75, "mutant", 1, mutant });
-
 	addSprite3d({ { 21.5, 49.5 }, 0, {
 		getSprite("enemy_0"),
 		getSprite("enemy_1"),
 		getSprite("enemy_2"),
 		getSprite("enemy_3"),
 	}, -90.0, 0.75, 16, 0.75, "mutant", 1, mutant });
+	addSprite3d({ { 8, 19 }, 0, {
+		getSprite("enemy_0"),
+		getSprite("enemy_1"),
+		getSprite("enemy_2"),
+		getSprite("enemy_3"),
+	}, 90.0, 0.75, 16, 0.75, "mutant", 1, mutant });
+	addSprite3d({ { 49.5, 24.5 }, 0,{
+		getSprite("enemy_0"),
+		getSprite("enemy_1"),
+		getSprite("enemy_2"),
+		getSprite("enemy_3"),
+	}, -90.0, 0.75, 16, 0.75, "mutant", 1, mutant });
+	addSprite3d({ { 61.5, 44.5 }, 0,{
+		getSprite("enemy_0"),
+		getSprite("enemy_1"),
+		getSprite("enemy_2"),
+		getSprite("enemy_3"),
+	}, 90.0, 0.75, 16, 0.75, "mutant", 1, mutant });
+	addSprite3d({ { 23.5, 10.5 }, 0,{
+		getSprite("enemy_0"),
+		getSprite("enemy_1"),
+		getSprite("enemy_2"),
+		getSprite("enemy_3"),
+	}, 0.0, 0.75, 16, 0.75, "mutant", 1, mutant });
 
-	/*addSprite3d({ { 24.5, 35.5 }, 0,{
+	addSprite3d({ { 43.5, 47.5 }, 0,{
 		getSprite("enemy1_0"),
 		getSprite("enemy1_1"),
 		getSprite("enemy1_2"),
 		getSprite("enemy1_3"),
-	}, 0.0, 0.75, 16, 0.75, "warrior", 1, warrior });*/
+	}, 0, 0.75, 16, 0.75, "warrior", 1, warrior });
+	addSprite3d({ { 43.5, 59.5 }, 0,{
+		getSprite("enemy1_0"),
+		getSprite("enemy1_1"),
+		getSprite("enemy1_2"),
+		getSprite("enemy1_3"),
+	}, 0, 0.75, 16, 0.75, "warrior", 1, warrior });
+	addSprite3d({ { 23, 23 }, 0,{
+		getSprite("enemy1_0"),
+		getSprite("enemy1_1"),
+		getSprite("enemy1_2"),
+		getSprite("enemy1_3"),
+	}, 180.0, 0.75, 16, 0.75, "warrior", 1, warrior });
+	addSprite3d({ { 29, 21.5 }, 0,{
+		getSprite("enemy1_0"),
+		getSprite("enemy1_1"),
+		getSprite("enemy1_2"),
+		getSprite("enemy1_3"),
+	}, 180.0, 0.75, 16, 0.75, "warrior", 1, warrior });
+	addSprite3d({ { 50.5, 9.5 }, 0,{
+		getSprite("enemy1_0"),
+		getSprite("enemy1_1"),
+		getSprite("enemy1_2"),
+		getSprite("enemy1_3"),
+	}, 0.0, 0.75, 16, 0.75, "warrior", 1, warrior });
+	addSprite3d({ { 41.5, 7.5 }, 0,{
+		getSprite("enemy1_0"),
+		getSprite("enemy1_1"),
+		getSprite("enemy1_2"),
+		getSprite("enemy1_3"),
+	}, 0.0, 0.75, 16, 0.75, "warrior", 1, warrior });
+	addSprite3d({ { 8.5, 8.5 }, 0,{
+		getSprite("enemy1_0"),
+		getSprite("enemy1_1"),
+		getSprite("enemy1_2"),
+		getSprite("enemy1_3"),
+	}, 0.0, 0.75, 16, 0.75, "warrior", 1, warrior });
 
 	addSprite3d({ { 27.5, 35.5 }, 0, {
 		getSprite("chest"),
@@ -383,20 +466,67 @@ void onWindowCreated() {
 		getSprite("chest"),
 		getSprite("chest"),
 	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { NULL, &I_POTION } });
-
 	addSprite3d({ { 18.5, 39.5 }, 0, {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { &A_FLAME, NULL } });
-
 	addSprite3d({ { 1.5, 45.5 }, 0, {
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 		getSprite("chest"),
 	}, 0.0, 0.5, 32, 0.5, "chest", 2, {}, { NULL, &I_POTION } });
+	addSprite3d({ { 29.5, 28.5 }, 0,{
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2,{},{ NULL, &I_MAXAP } });
+	addSprite3d({ { 31.5, 28.5 }, 0,{
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2,{},{ NULL, &I_ELIXIR } });
+	addSprite3d({ { 43.5, 51.5 }, 0,{
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2,{},{ &A_FREEZE, NULL } });
+	addSprite3d({ { 55.5, 39.5 }, 0,{
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2,{},{ NULL, &I_MAXHP } });
+	addSprite3d({ { 57.5, 6.5 }, 0,{
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2,{},{ NULL, &I_ELIXIR2 } });
+	addSprite3d({ { 33.5, 6.5 }, 0,{
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2,{},{ NULL, &I_POTION2 } });
+	addSprite3d({ { 19.5, 10.5 }, 0,{
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2,{},{ NULL, &I_POTION3 } });
+	// Hidden chest out of bounds (outside of boss room) - contains most powerful attack
+	addSprite3d({ { 7.5, 12.5 }, 0,{
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+		getSprite("chest"),
+	}, 0.0, 0.5, 32, 0.5, "chest", 2,{},{ &A_FINAL, NULL } });
 
 	addSprite3d({ { 1.5, 43.5 }, 0, {
 		getSprite("barrel"),
@@ -416,6 +546,57 @@ void onWindowCreated() {
 		getSprite("barrel"),
 		getSprite("barrel"),
 	}, 0.0, 0.75, 16, 0.75, "barrel", 0 });
+	addSprite3d({ { 56.5, 25.5 }, 0,{
+		getSprite("barrel"),
+		getSprite("barrel"),
+		getSprite("barrel"),
+		getSprite("barrel"),
+	}, 0.0, 0.75, 16, 0.75, "barrel", 0 });
+	addSprite3d({ { 56.5, 26.5 }, 0,{
+		getSprite("barrel"),
+		getSprite("barrel"),
+		getSprite("barrel"),
+		getSprite("barrel"),
+	}, 0.0, 0.75, 16, 0.75, "barrel", 0 });
+
+	addSprite3d({ { 9.5, 33.5 }, 0, {
+		getSprite("comp_0"),
+		getSprite("comp_1"),
+		getSprite("comp_2"),
+		getSprite("comp_3"),
+	}, 90.0, 0.75, 16, 0.5, "computer", 0 });
+	addSprite3d({ { 60.5, 51.5 }, 0,{
+		getSprite("comp_0"),
+		getSprite("comp_1"),
+		getSprite("comp_2"),
+		getSprite("comp_3"),
+	}, 90.0, 0.75, 16, 0.5, "computer", 0 });
+	addSprite3d({ { 8.5, 7.5 }, 0,{
+		getSprite("comp_0"),
+		getSprite("comp_1"),
+		getSprite("comp_2"),
+		getSprite("comp_3"),
+	}, 0.0, 0.75, 16, 0.5, "computer", 0 });
+
+	addSprite3d({ { 3.5, 7.5 }, 0,{
+		getSprite("torch"),
+		getSprite("torch"),
+		getSprite("torch"),
+		getSprite("torch"),
+	}, 0.0, 0.75, 16, 0.5, "torch", 0 });
+	addSprite3d({ { 3.5, 9.5 }, 0,{
+		getSprite("torch"),
+		getSprite("torch"),
+		getSprite("torch"),
+		getSprite("torch"),
+	}, 0.0, 0.75, 16, 0.5, "torch", 0 });
+
+	addSprite3d({ { 2.5, 8.5 }, 0, {
+		getSprite("boss_0"),
+		getSprite("boss_1"),
+		getSprite("boss_2"),
+		getSprite("boss_3"),
+	}, 0.0, 1, 0, 1, "boss", 1, boss });
 
 	// Arrays used for 3D sprite sorting
 	spriteDist.resize(sprites3d.size());
@@ -854,8 +1035,7 @@ void renderEnvironment() {
 						for (int y = drawStartY; y < drawEndY; y++) {
 							int d = (y - spriteMove) * 256 - SCREEN_HEIGHT * 128 + spriteHeight * 128;
 							int texY = ((d * drawSprite.height) / spriteHeight) / 256;
-							if (texY < drawSprite.height && texX < drawSprite.width
-								&& texY > -1 && texX > -1) {
+							if (texY < drawSprite.height && texX < drawSprite.width && texY > -1 && texX > -1) {
 								WORD color = drawSprite.colors[drawSprite.width * texY + texX];
 								wchar_t character = drawSprite.chars[drawSprite.width * texY + texX];
 								if (color > 0) {
@@ -982,8 +1162,9 @@ vector<item> getStackedItems() {
 void update() {
 	bool action = keys[0x0D].pressed || keys[VK_SPACE].pressed;
 
-#pragma region Main game rendering
-	if (menu == 0) {
+	switch (menu) {
+	// Main environment
+	case 0: {
 		bool transFlag = false;
 		if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
 			transFlag = true;
@@ -994,7 +1175,7 @@ void update() {
 			clearUI();
 
 			moveSpeed = 20 * deltaTime;
-			rotSpeed = 3 * deltaTime * rotIntensity;
+			rotSpeed = 4 * deltaTime * rotIntensity;
 			velocity = lerp(velocity, 0, deltaTime * 10);
 
 			// Key input (movement, rotation, interaction)
@@ -1006,15 +1187,11 @@ void update() {
 
 				ppx = playerPos.x + playerDir.x * moveSpeed;
 				ppy = playerPos.y;
-				if ((worldMap[int(ppx)][int(ppy)] == false ||
-					tileTimers[int(ppx)][int(ppy)] == 0.0) &&
-					isSpriteCollided(ppx, ppy) == false)
+				//if ((worldMap[int(ppx)][int(ppy)] == false || tileTimers[int(ppx)][int(ppy)] == 0.0) && isSpriteCollided(ppx, ppy) == false)
 					playerPos.x += playerDir.x * moveSpeed * velocity;
 				ppx = playerPos.x;
 				ppy = playerPos.y + playerDir.y * moveSpeed;
-				if ((worldMap[int(ppx)][int(ppy)] == false ||
-					tileTimers[int(ppx)][int(ppy)] == 0.0) &&
-					isSpriteCollided(ppx, ppy) == false)
+				//if ((worldMap[int(ppx)][int(ppy)] == false || tileTimers[int(ppx)][int(ppy)] == 0.0) && isSpriteCollided(ppx, ppy) == false)
 					playerPos.y += playerDir.y * moveSpeed * velocity;
 			}
 			// Key S is down
@@ -1023,15 +1200,11 @@ void update() {
 
 				ppx = playerPos.x - playerDir.x * moveSpeed;
 				ppy = playerPos.y;
-				if ((worldMap[int(ppx)][int(ppy)] == false ||
-					tileTimers[int(ppx)][int(ppy)] == 0.0) &&
-					isSpriteCollided(ppx, ppy) == false)
+				//if ((worldMap[int(ppx)][int(ppy)] == false || tileTimers[int(ppx)][int(ppy)] == 0.0) && isSpriteCollided(ppx, ppy) == false)
 					playerPos.x -= playerDir.x * moveSpeed * velocity;
 				ppx = playerPos.x;
 				ppy = playerPos.y - playerDir.y * moveSpeed;
-				if ((worldMap[int(ppx)][int(ppy)] == false ||
-					tileTimers[int(ppx)][int(ppy)] == 0.0) &&
-					isSpriteCollided(ppx, ppy) == false)
+				//if ((worldMap[int(ppx)][int(ppy)] == false || tileTimers[int(ppx)][int(ppy)] == 0.0) && isSpriteCollided(ppx, ppy) == false)
 					playerPos.y -= playerDir.y * moveSpeed * velocity;
 			}
 			// Key A is down
@@ -1042,7 +1215,7 @@ void update() {
 				double oldPlaneX = camPlane.x;
 				camPlane.x = camPlane.x * cos(-rotSpeed) - camPlane.y * sin(-rotSpeed);
 				camPlane.y = oldPlaneX * sin(-rotSpeed) + camPlane.y * cos(-rotSpeed);
-				rotIntensity = lerp(rotIntensity, 1, deltaTime * 3);
+				rotIntensity = lerp(rotIntensity, 1, deltaTime * 7);
 			}
 			// Key D is down
 			if (keys[0x41].held) {
@@ -1052,11 +1225,11 @@ void update() {
 				double oldPlaneX = camPlane.x;
 				camPlane.x = camPlane.x * cos(rotSpeed) - camPlane.y * sin(rotSpeed);
 				camPlane.y = oldPlaneX * sin(rotSpeed) + camPlane.y * cos(rotSpeed);
-				rotIntensity = lerp(rotIntensity, 1, deltaTime * 3);
+				rotIntensity = lerp(rotIntensity, 1, deltaTime * 7);
 			}
 			// Key E was pressed
 			if (keys[0x45].pressed) {
-				gameOver();
+				
 			}
 			if (!keys[0x44].held && !keys[0x41].held) rotIntensity = 0;
 
@@ -1099,9 +1272,9 @@ void update() {
 			//drawSprite(SCREEN_WIDTH - 54 + int(sin((double)frame / 8) * 10 * bobIntensity), SCREEN_HEIGHT - 54 + int(sin((double)frame / 4) * 5 * bobIntensity), getUiSprite("gun1"));
 
 			if (getFlag("getitem")) {
-				drawRectUI(5, 5, SCREEN_WIDTH - 10, 17, PIXEL_SHADE0, FOREGROUND_BLUE);
+				drawRectUI(0, 5, SCREEN_WIDTH, 17, PIXEL_SHADE0, FOREGROUND_BLUE);
 				sprintf(dbg, "%s", messageString.c_str());
-				printText(dbg, 10, 9, UPPER);
+				printText(dbg, 6, 9, UPPER);
 			}
 
 			if (DISPLAY_FPS) {
@@ -1109,7 +1282,7 @@ void update() {
 				printText(dbg, 1, 1, UPPER);
 			}
 
-			//sprintf(dbg, "%s", getItemByName("Potion I").name);
+			//sprintf(dbg, "%f, %f", playerPos.x, playerPos.y);
 			//printText(dbg, 1, 1, LOWER);
 
 			// Key Space was pressed
@@ -1124,7 +1297,8 @@ void update() {
 						pStats.attacks.push_back(*(sprites3d[frontSprite].obtain.oAttack));
 						sprintf(dbg, "Received %s.", (*(sprites3d[frontSprite].obtain.oAttack)).name);
 						messageString = dbg;
-					} else if (sprites3d[frontSprite].obtain.oItem != NULL) {
+					}
+					else if (sprites3d[frontSprite].obtain.oItem != NULL) {
 						pStats.items.push_back(*(sprites3d[frontSprite].obtain.oItem));
 						sprintf(dbg, "Received %s.", (*(sprites3d[frontSprite].obtain.oItem)).name);
 						messageString = dbg;
@@ -1142,10 +1316,11 @@ void update() {
 		if (transFlag) {
 			readyForClrTrans();
 		}
-#pragma endregion
-#pragma region Title screen
-	} else if (menu == 1) {	//Main menu
 
+		break;
+	}
+	// Title screen
+	case 1: {
 		paused = false;
 
 		bool transFlag = false;
@@ -1170,7 +1345,7 @@ void update() {
 
 		// Draw selection arrow and border
 		char arrowFrame[7];
-		sprintf(arrowFrame, "arrow%d", ((frame/4) % 8));
+		sprintf(arrowFrame, "arrow%d", ((frame / 4) % 8));
 		int buttonLoc = SCREEN_HEIGHT / 2 - uiSprites[3].height / 2 + (18 * selectedButton) - 5;
 		drawSpriteTransparent(SCREEN_WIDTH / 2 - uiSprites[3].width / 2, buttonLoc, uiSprites[3]);
 		drawSpriteTransparent(30, buttonLoc, getSprite(arrowFrame));
@@ -1178,8 +1353,8 @@ void update() {
 		// Capture key presses for selection (W and S)
 		if (keys[0x57].pressed) selectedButton--;
 		if (keys[0x53].pressed) selectedButton++;
-		if (selectedButton > maxMenuItems-1) selectedButton = 0;
-		if (selectedButton < 0) selectedButton = maxMenuItems-1;
+		if (selectedButton > maxMenuItems - 1) selectedButton = 0;
+		if (selectedButton < 0) selectedButton = maxMenuItems - 1;
 
 		drawRectUI(SCREEN_WIDTH - uiSprites[6].width + 1, SCREEN_HEIGHT - uiSprites[6].height - 1, SCREEN_WIDTH - uiSprites[6].width - 1, SCREEN_HEIGHT - uiSprites[6].height + 1, PIXEL_SHADE0, 1);
 
@@ -1192,8 +1367,7 @@ void update() {
 				menu = 3;
 				mergeBuffers();
 				clearUI();
-				//nextMenu = 9;
-				nextMenu = 0;
+				nextMenu = 9;
 			}
 			if (selectedButton == 1) {
 				menu = 3;
@@ -1208,10 +1382,11 @@ void update() {
 		if (transFlag) {
 			readyForClrTrans();
 		}
-#pragma endregion
-#pragma region Options menu
-	} else if (menu == 2) {	// Options menu
 
+		break;
+	}
+	// Options menu
+	case 2: {
 		bool transFlag = false;
 		if (buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
 			transFlag = true;
@@ -1234,8 +1409,8 @@ void update() {
 		// Capture key presses for selection (W and S)
 		if (keys[0x57].pressed) selectedButton--;
 		if (keys[0x53].pressed) selectedButton++;
-		if (selectedButton > maxMenuItems-1) selectedButton = 0;
-		if (selectedButton < 0) selectedButton = maxMenuItems-1;
+		if (selectedButton > maxMenuItems - 1) selectedButton = 0;
+		if (selectedButton < 0) selectedButton = maxMenuItems - 1;
 
 		// Capture enter key to select button
 		if (action) {
@@ -1253,10 +1428,11 @@ void update() {
 		if (transFlag) {
 			readyForClrTrans();
 		}
-#pragma endregion
-#pragma region Menu to black transition
-	} else if (menu == 3) {	// Transition from menu to black screen
 
+		break;
+	}
+	// Transition from menu to black screen
+	case 3: {
 		srand(3);
 		for (int i = 0; i < SCREEN_HEIGHT; i++) {
 			int rnd = rand();
@@ -1268,12 +1444,13 @@ void update() {
 
 		selectedButton++;
 
-		if (selectedButton >= SCREEN_WIDTH/2)
+		if (selectedButton >= SCREEN_WIDTH / 2)
 			menu = nextMenu;
-#pragma endregion
-#pragma region Black to menu transition
-	} else if (menu == 4) {	// Transition from black to new menu
 
+		break;
+	}
+	// Transition from black to new menu
+	case 4: {
 		srand(4);
 		for (int i = 0; i < SCREEN_HEIGHT; i++) {
 			int rnd = rand();
@@ -1281,23 +1458,24 @@ void update() {
 			for (int j = 0; j < speed; j++) {
 				int x = SCREEN_WIDTH + 32 + j - (selectedButton * speed) - (rnd % 32 + 1);
 				int index = i * SCREEN_WIDTH + x;
-				if(index > -1 && index < BUFFER_SIZE)
+				if (index > -1 && index < BUFFER_SIZE)
 					draw(x, i, transBuffer[index].Char.UnicodeChar, transBuffer[index].Attributes);
 			}
 		}
 
 		selectedButton++;
 
-		if (selectedButton >= SCREEN_WIDTH/2) {
+		if (selectedButton >= SCREEN_WIDTH / 2) {
 			menu = nextMenu;
 			delete[] transBuffer;
 			selectedButton = 0;
 			srand(time(0));
 		}
-#pragma endregion
-#pragma region Pause screen
-	} else if (menu == 5) {	// Pause screen
 
+		break;
+	}
+	// Pause screen
+	case 5: {
 		maxMenuItems = 3;
 
 		// Resume button
@@ -1310,8 +1488,8 @@ void update() {
 		// Capture key presses for selection (W and S)
 		if (keys[0x57].pressed) selectedButton--;
 		if (keys[0x53].pressed) selectedButton++;
-		if (selectedButton > maxMenuItems-1) selectedButton = 0;
-		if (selectedButton < 0) selectedButton = maxMenuItems-1;
+		if (selectedButton > maxMenuItems - 1) selectedButton = 0;
+		if (selectedButton < 0) selectedButton = maxMenuItems - 1;
 
 		// Draw selection border
 		int buttonLoc = SCREEN_HEIGHT / 2 - uiSprites[3].height / 2 + (18 * selectedButton) - 18;
@@ -1341,15 +1519,19 @@ void update() {
 			// Key ESC was pressed
 			pauseGame();
 		}
-#pragma endregion
-#pragma region Battle screen
-	} else if (menu == 6) {	// Battle screen
 
+		break;
+	}
+	// Battle screen
+	case 6: {
 		bool transFlag = false;
 		if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
 			transFlag = true;
 
-		fillScreen(PIXEL_SHADE1, FOREGROUND_RED | FOREGROUND_BLUE);
+		if(battleData.eStats.name == "LowEye")
+			fillScreen(PIXEL_SHADE1, FOREGROUND_RED);
+		else
+			fillScreen(PIXEL_SHADE1, FOREGROUND_RED | FOREGROUND_BLUE);
 		clearUI();
 
 		// Capture key presses for selection (W and S)
@@ -1372,7 +1554,8 @@ void update() {
 				selectedButton = maxMenuItems - 1;
 				battleData.scrollPos = maxMenuItems - 3;
 			}
-		} else {
+		}
+		else {
 			if (selectedButton > maxMenuItems - 1) selectedButton = maxMenuItems - 1;
 			if (selectedButton < 0) selectedButton = 0;
 		}
@@ -1385,8 +1568,8 @@ void update() {
 		enemyTick(battleData.prevEHp, SCREEN_WIDTH / 2 - sprWidth * sprScale / 2, SCREEN_HEIGHT / 2 - sprHeight * sprScale / 2 - 10, sprScale, sprites3d[lookSprite].sprites[0]);
 
 
-// ---Begin drawing battle menu---
-		vec2Int menuPos = {2, SCREEN_HEIGHT - 32};
+		// ---Begin drawing battle menu---
+		vec2Int menuPos = { 2, SCREEN_HEIGHT - 32 };
 
 		if (getFlag("attackPAnim")) {
 			menuPos.x += rand() % 3 - 1;
@@ -1413,8 +1596,8 @@ void update() {
 
 		if (getFlag("potionFx")) {
 			for (int y = -1; y < 6; y++) {
-				for (int x = -1; x < 35 ; x++) {
-					int rnd = rand() % (int((100-(double)getFlagFramesLeft("potionFx"))/10)+1);
+				for (int x = -1; x < 35; x++) {
+					int rnd = rand() % (int((100 - (double)getFlagFramesLeft("potionFx")) / 10) + 1);
 					if (rnd == 0) drawUI(x + menuPos.x + 118, y + menuPos.y + 4, PIXEL_SHADE0, (FOREGROUND_GREEN | FOREGROUND_INTENSITY) + 1);
 				}
 			}
@@ -1427,14 +1610,14 @@ void update() {
 				}
 			}
 		}
-		
+
 		if (battleData.battleMenu == 1) {
-			drawSpriteTransparent(menuPos.x+16, menuPos.y-8, getUiSprite("battle_menu_half"));
+			drawSpriteTransparent(menuPos.x + 16, menuPos.y - 8, getUiSprite("battle_menu_half"));
 
 			int sz = 3;
 			if (maxMenuItems < sz) sz = maxMenuItems;
 			for (int i = battleData.scrollPos; i < battleData.scrollPos + sz; i++) {
-				printText(pStats.attacks[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8*(i - battleData.scrollPos), DEFAULT, "chars_small");
+				printText(pStats.attacks[i].name, menuPos.x + 20 + (selectedButton == i ? 6 : 0), menuPos.y - 4 + 8 * (i - battleData.scrollPos), DEFAULT, "chars_small");
 			}
 
 			if (keys[VK_BACK].pressed) {
@@ -1443,7 +1626,8 @@ void update() {
 				maxMenuItems = 3;
 				battleData.scrollPos = 0;
 			}
-		} else if (battleData.battleMenu == 2) {
+		}
+		else if (battleData.battleMenu == 2) {
 			drawSpriteTransparent(menuPos.x + 16, menuPos.y - 8, getUiSprite("battle_menu_half"));
 			vector<item> stacked = getStackedItems();
 
@@ -1481,7 +1665,7 @@ void update() {
 		}
 
 
-// ---End drawing battle menu---
+		// ---End drawing battle menu---
 
 		printText(battleData.eStats.name, 1, 1, DEFAULT, "chars_small");
 		// Enemy health bar
@@ -1497,7 +1681,7 @@ void update() {
 					battleData.timerFrame = frame;
 					if (selectedButton == 0) {
 						battleData.turn = 1;
-						battleData.prevEHp -= ceil((double)pStats.strength / battleData.eStats.defense) * (8 + (rand() % 2)) * ceil((double)pStats.level/10);
+						battleData.prevEHp -= ceil((double)pStats.strength / battleData.eStats.defense) * (8 + (rand() % 2)) * ceil((double)pStats.level / 10);
 					}
 				}
 				if (selectedButton == 1) {
@@ -1512,7 +1696,8 @@ void update() {
 					maxMenuItems = getNumStackedItems();
 					battleData.scrollPos = 0;
 				}
-			} else if (battleData.battleMenu == 1) {
+			}
+			else if (battleData.battleMenu == 1) {
 				if (pStats.attacks.size() > 0) {
 					attack pAttack = pStats.attacks[selectedButton];
 					if (pStats.ap >= pAttack.apCost) {
@@ -1523,13 +1708,15 @@ void update() {
 						battleData.turn = 1;
 						battleData.timerFrame = frame;
 						pStats.ap -= pAttack.apCost;
-					} else {
+					}
+					else {
 						battleData.timerFrame = frame;
 						setFlag("msgShown", 240);
 					}
 				}
 				battleData.scrollPos = 0;
-			} else if (battleData.battleMenu == 2) {
+			}
+			else if (battleData.battleMenu == 2) {
 				if (pStats.items.size() > 0) {
 					vector<item> stacked = getStackedItems();
 					item pItem = stacked[selectedButton];
@@ -1546,7 +1733,7 @@ void update() {
 		}
 
 		if (battleData.turn == 1) {
-			if(battleData.eStats.hp - battleData.prevEHp > 0) battleData.timerFrame = frame;
+			if (battleData.eStats.hp - battleData.prevEHp > 0) battleData.timerFrame = frame;
 			if (frame - battleData.timerFrame > 50) {
 				int attackIndex = rand() % battleData.eStats.attacks.size();
 				attack eAttack = battleData.eStats.attacks[attackIndex];
@@ -1555,7 +1742,8 @@ void update() {
 				setFlag("attackPAnim", 30);
 			}
 			removeFlag("msgShown");
-		} else {
+		}
+		else {
 			if (!transFlag && getFlag("msgShown")) {
 				printText("Not enough AP.", menuPos.x, menuPos.y - 16, DEFAULT, "chars_small");
 			}
@@ -1564,13 +1752,20 @@ void update() {
 		// If enemy HP is zero, end the battle and reward player
 		if (battleData.eStats.hp <= 0) {
 			selectedButton = 0;
-			menu = 3;
-			mergeBuffers();
-			clearUI();
-			nextMenu = 0;
 			sprites3d[lookSprite].active = false;
 			pStats.xp += battleData.eStats.xp;
-			while(pStats.xp >= pStats.maxXp) {
+			if (battleData.eStats.name == "LowEye") {
+				menu = 3;
+				mergeBuffers();
+				clearUI();
+				nextMenu = 11;
+			} else {
+				menu = 3;
+				mergeBuffers();
+				clearUI();
+				nextMenu = 0;
+			}
+			while (pStats.xp >= pStats.maxXp) {
 				pStats.level++;
 				pStats.xp = pStats.xp - pStats.maxXp;
 				pStats.maxXp *= 1.5;
@@ -1579,6 +1774,9 @@ void update() {
 				messageString = dbg;
 				setFlag("getitem", 125);
 			}
+
+			pStats.strength += floor(pStats.level / 2);
+			pStats.defense += floor(pStats.level / 2);
 		}
 
 		//If player HP is zero, game over :(
@@ -1589,9 +1787,11 @@ void update() {
 		if (transFlag) {
 			readyForClrTrans();
 		}
-#pragma endregion
-#pragma region Player statistics screen
-	} else if (menu == 7) {		// Player stats
+
+		break;
+	}
+	// Player stats
+	case 7: {
 		bool transFlag = false;
 		if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
 			transFlag = true;
@@ -1621,9 +1821,11 @@ void update() {
 		if (transFlag) {
 			readyForClrTrans();
 		}
-#pragma endregion
-#pragma region Game over screen
-	} else if (menu == 8) {		// Game over screen
+
+		break;
+	}
+	// Game over screen
+	case 8: {
 		clearScreen();
 		clearUI();
 
@@ -1673,77 +1875,157 @@ void update() {
 					menu = 0;
 					loadSaveFile();
 				}
-			} else if (selectedButton == 1) {
+			}
+			else if (selectedButton == 1) {
 				printText("Close the game.", 48, 100, DEFAULT, "chars_small");
 				if (action) {
 					exit(0);
 				}
 			}
-		} else {
+		}
+		else {
 			if (action) {
 				battleData.scrollPos = -40;
 			}
 		}
-#pragma endregion
-#pragma region New/Load screen
-	} else if (menu == 9) {		// New/Load screen
 
-	bool transFlag = false;
-	if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
-		transFlag = true;
-
-	fillScreen(PIXEL_SHADE2, FOREGROUND_RED);
-	clearUI();
-	maxMenuItems = 3;
-
-	// New game button
-	drawSprite(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 17, getUiSprite("button_newgame"));
-	// Continue button
-	drawSprite(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 1, getUiSprite("button_continue"));
-	// Back button
-	drawSprite(SCREEN_WIDTH - 69, SCREEN_HEIGHT - 19, uiSprites[10]);
-
-	// Draw selection arrow and border
-	char arrowFrame[7];
-	sprintf(arrowFrame, "arrow%d", ((frame / 4) % 8));
-
-	// Draw selection border
-	if (selectedButton == 2) {
-		drawSprite(73, SCREEN_HEIGHT - 19, getSprite(arrowFrame));
-		drawSpriteTransparent(SCREEN_WIDTH - 69, SCREEN_HEIGHT - 19, uiSprites[3]);
-	} else {
-		int buttonLoc = SCREEN_HEIGHT / 2 + (18 * selectedButton) - 17;
-		drawSpriteTransparent(SCREEN_WIDTH / 2 - 50, buttonLoc, getUiSprite("button_border_large"));
-		drawSprite(12, buttonLoc, getSprite(arrowFrame));
+		break;
 	}
+	// New/Load screen
+	case 9: {
+		bool transFlag = false;
+		if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
+			transFlag = true;
 
-	// Capture key presses for selection (W and S)
-	if (keys[0x57].pressed) selectedButton--;
-	if (keys[0x53].pressed) selectedButton++;
-	if (selectedButton > maxMenuItems - 1) selectedButton = 0;
-	if (selectedButton < 0) selectedButton = maxMenuItems - 1;
+		fillScreen(PIXEL_SHADE2, FOREGROUND_RED);
+		clearUI();
+		maxMenuItems = 3;
 
-	// Capture enter key to select button
-	if (action) {
-		if (selectedButton == 0) {
-			menu = 0;
-			clearUI();
+		// New game button
+		drawSprite(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 - 17, getUiSprite("button_newgame"));
+		// Continue button
+		drawSprite(SCREEN_WIDTH / 2 - 50, SCREEN_HEIGHT / 2 + 1, getUiSprite("button_continue"));
+		// Back button
+		drawSprite(SCREEN_WIDTH - 69, SCREEN_HEIGHT - 19, uiSprites[10]);
+
+		// Draw selection arrow and border
+		char arrowFrame[7];
+		sprintf(arrowFrame, "arrow%d", ((frame / 4) % 8));
+
+		// Draw selection border
+		if (selectedButton == 2) {
+			drawSprite(73, SCREEN_HEIGHT - 19, getSprite(arrowFrame));
+			drawSpriteTransparent(SCREEN_WIDTH - 69, SCREEN_HEIGHT - 19, uiSprites[3]);
 		}
-		if (selectedButton == 1) {
-			menu = 0;
-			clearUI();
-			loadSaveFile();
+		else {
+			int buttonLoc = SCREEN_HEIGHT / 2 + (18 * selectedButton) - 17;
+			drawSpriteTransparent(SCREEN_WIDTH / 2 - 50, buttonLoc, getUiSprite("button_border_large"));
+			drawSprite(12, buttonLoc, getSprite(arrowFrame));
 		}
-		if (selectedButton == 2) menu = 1;
-		selectedButton = 0;
-	}
 
-	if (transFlag) {
-		readyForClrTrans();
-	}
-#pragma endregion
-}
+		// Capture key presses for selection (W and S)
+		if (keys[0x57].pressed) selectedButton--;
+		if (keys[0x53].pressed) selectedButton++;
+		if (selectedButton > maxMenuItems - 1) selectedButton = 0;
+		if (selectedButton < 0) selectedButton = maxMenuItems - 1;
 
+		// Capture enter key to select button
+		if (action) {
+			if (selectedButton == 0) {
+				menu = 3;
+				mergeBuffers();
+				nextMenu = 10;
+				battleData.timerFrame = frame;
+				clearUI();
+			}
+			if (selectedButton == 1) {
+				menu = 0;
+				clearUI();
+				loadSaveFile();
+			}
+			if (selectedButton == 2) menu = 1;
+			selectedButton = 0;
+		}
+
+		if (transFlag) {
+			readyForClrTrans();
+		}
+
+		break;
+	}
+	// Story intro screen
+	case 10: {
+		bool transFlag = false;
+		if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
+			transFlag = true;
+
+		clearScreen();
+		clearUI();
+
+		draw(0, 0, PIXEL_SHADE3, FOREGROUND_RED);
+
+		int dframe = frame - battleData.timerFrame;
+		vec2 textPos = { 10, 20 };
+
+		printText("Spaceship 451", textPos.x, textPos.y + 0, DEFAULT, "chars_small");
+		printText("Hey so the aliens on our ship", textPos.x, textPos.y + 16, DEFAULT, "chars_small");
+		printText("have taken over and we'd like", textPos.x, textPos.y + 24, DEFAULT, "chars_small");
+		printText("to reposess custody of it. If", textPos.x, textPos.y + 32, DEFAULT, "chars_small");
+		printText("you could take care of that,", textPos.x, textPos.y + 40, DEFAULT, "chars_small");
+		printText("that'd be great.", textPos.x, textPos.y + 48, DEFAULT, "chars_small");
+
+		printText("Thanks,", textPos.x, textPos.y + 64, DEFAULT, "chars_small");
+		printText("Management", textPos.x, textPos.y + 72, DEFAULT, "chars_small");
+
+		if (dframe > 700) {
+			menu = 3;
+			mergeBuffers();
+			clearUI();
+			nextMenu = 0;
+		}
+
+		if (transFlag) {
+			readyForClrTrans();
+		}
+
+		break;
+	}
+	// Endgame text menu
+	case 11: {
+		bool transFlag = false;
+		if (frame > 0 && buffer[0].Attributes == 0 && buffer[BUFFER_SIZE - 1].Attributes == 0)
+			transFlag = true;
+
+		clearScreen();
+		clearUI();
+
+		draw(0, 0, PIXEL_SHADE3, FOREGROUND_RED);
+
+		int dframe = frame - battleData.timerFrame;
+		vec2 textPos = { 10, 20 };
+
+		printText("Congratulations on completing", textPos.x, textPos.y + 8, DEFAULT, "chars_small");
+		printText("Spaceship 451. You have passed", textPos.x, textPos.y + 16, DEFAULT, "chars_small");
+		printText("our test. Now begins the real", textPos.x, textPos.y + 24, DEFAULT, "chars_small");
+		printText("journey.", textPos.x, textPos.y + 32, DEFAULT, "chars_small");
+
+		printText("From,", textPos.x, textPos.y + 48, DEFAULT, "chars_small");
+		printText("Unknown", textPos.x, textPos.y + 56, DEFAULT, "chars_small");
+
+		if (dframe > 800) {
+			menu = 3;
+			mergeBuffers();
+			clearUI();
+			nextMenu = 1;
+		}
+
+		if (transFlag) {
+			readyForClrTrans();
+		}
+
+		break;
+	}
+	}
 
 	// Update flags
 	for (int i = 0; i < flags.size(); i++) {
